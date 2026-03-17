@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Gerenciador de Academia - MVP</title>
+    <style>
+      body{font-family:Arial,Helvetica,sans-serif;padding:20px}
+      input,button{padding:8px;margin:4px}
+      .member{border-bottom:1px solid #ddd;padding:6px 0}
+    </style>
+  </head>
+  <body>
+    <h1>Gerenciador de Academia</h1>
+    <section>
+      <h2>Cadastrar membro</h2>
+      <input id="name" placeholder="Nome" />
+      <input id="email" placeholder="Email" />
+      <button id="create">Criar</button>
+    </section>
+
+    <section>
+      <h2>Membros</h2>
+      <div id="members"></div>
+    </section>
+
+    <script>
+      const api = '/api'
+      async function list(){
+        const res = await fetch(api + '/members')
+        const data = await res.json()
+        const c = document.getElementById('members')
+        c.innerHTML = data.map(m => `<div class="member">${m.name} &lt;${m.email || ''}&gt;</div>`).join('')
+      }
+      document.getElementById('create').addEventListener('click', async ()=>{
+        const name = document.getElementById('name').value
+        const email = document.getElementById('email').value
+        await fetch(api + '/members', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name,email})})
+        document.getElementById('name').value=''
+        document.getElementById('email').value=''
+        list()
+      })
+      list()
+    </script>
+  </body>
+</html>
