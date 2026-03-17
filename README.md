@@ -6,20 +6,29 @@ Como executar (local, sem Docker - rápido para desenvolvimento):
 
 1. Crie e ative um ambiente virtual
 
-```bash
+```powershell
 python -m venv .venv
-source .venv/bin/activate
+.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-2. Rodar localmente usando sqlite (padrão para testes rápidos)
+2. Configure o banco de dados e migrações
 
-```bash
-export DATABASE_URI="sqlite:///dev.db"
+```powershell
+$env:DATABASE_URI = "sqlite:///dev.db"
+$env:FLASK_APP = "run.py"
+flask db init
+flask db migrate -m "initial migration"
+flask db upgrade
+```
+
+3. Rode a aplicação
+
+```powershell
 python run.py
 ```
 
-3. Acesse http://localhost:5000
+4. Acesse http://localhost:5000
 
 Como executar com Docker (app + MySQL):
 
