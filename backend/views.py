@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from . import db
 from .models import Member
 
@@ -17,10 +17,16 @@ def members():
         name = data.get('name')
         if not name:
             return jsonify({"error": "name required"}), 400
+
         m = Member(name=name, email=data.get('email'), phone=data.get('phone'))
         db.session.add(m)
-        db.session.commit()
-        return jsonify({"id": m.id, "name": m.name}), 201
+        try:
+            db.session.commit()
+            return jsonify({"id": m.id, "name": m.name}), 201
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.exception("Error creating member")
+            return jsonify({"error": "Internal server error", "detail": str(e)}), 500
     else:
         members = Member.query.all()
         return jsonify([{"id": m.id, "name": m.name, "email": m.email} for m in members])
@@ -42,3 +48,14 @@ def member_detail(id):
         db.session.delete(m)
         db.session.commit()
         return jsonify({"deleted": True})
+
+
+@bp.route('/db-check', methods=['GET'])
+def db_check():
+    try:
+        member_count = Member.query.count()
+        return jsonify({"db": "ok", "member_count": member_count})
+    except Exception as e:
+        current_app.logger.exception('DB check failed')
+        return jsonify({"db": "error", "detail": str(e)}), 500
+

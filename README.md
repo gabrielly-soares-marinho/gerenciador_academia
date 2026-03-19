@@ -12,29 +12,59 @@ python -m venv .venv
 pip install -r requirements.txt
 ```
 
-2. Configure o banco de dados e migrações
+2. Configure o banco de dados e migrações (mesmo para local ou docker)
 
 ```powershell
-$env:DATABASE_URI = "sqlite:///dev.db"
+# se usando local com MySQL rodando na porta 3307 (docker-compose atual)
+$env:DATABASE_URI = "mysql+pymysql://root:password@localhost:3307/academia"
 $env:FLASK_APP = "run.py"
 flask db init
 flask db migrate -m "initial migration"
 flask db upgrade
 ```
 
-3. Rode a aplicação
+3. Opção A: Rode a aplicação local (sem Docker)
 
 ```powershell
 python run.py
 ```
 
-4. Acesse http://localhost:5000
+- URL local (app flask): http://localhost:5000
+- Endpoints locais:
+  - http://localhost:5000/api/health
+  - http://localhost:5000/api/db-check
+  - http://localhost:5000/api/members
 
-Como executar com Docker (app + MySQL):
+4. Opção B: Rode com Docker (app + MySQL)
 
 ```bash
-docker compose up --build
+docker compose up --build -d
+# aguarde o container iniciar e então:
+docker compose exec app flask db upgrade
 ```
+
+- URL docker: http://localhost:5001
+- Endpoints docker:
+  - http://localhost:5001/api/health
+  - http://localhost:5001/api/db-check
+  - http://localhost:5001/api/members
+
+5. Testar cadastro
+
+```powershell
+curl.exe -X POST "http://localhost:5001/api/members" `
+  -H "Content-Type: application/json" `
+  -d '{"name":"NOME","email":"email@x.com","phone":"123456"}'
+
+curl.exe "http://localhost:5001/api/members"
+```
+
+6. Verificar dados no MySQL
+
+```bash
+docker compose exec db mysql -uroot -ppassword -e "USE academia; SELECT * FROM member;"
+```
+
 
 Endpoints principais:
 - `GET /api/health` - health check
