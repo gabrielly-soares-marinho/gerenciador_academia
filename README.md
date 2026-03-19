@@ -15,6 +15,7 @@ pip install -r requirements.txt
 2. Configure o banco de dados e migrações (mesmo para local ou docker)
 
 ```powershell
+#& ".\.venv\Scripts\flask.exe" db migrate -m "initial migration"
 # se usando local com MySQL rodando na porta 3307 (docker-compose atual)
 $env:DATABASE_URI = "mysql+pymysql://root:password@localhost:3307/academia"
 $env:FLASK_APP = "run.py"
