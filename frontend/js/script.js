@@ -79,7 +79,6 @@ function verificarLogin() {
     }
 }
 
-
 // 🚪 LOGOUT
 function logout() {
     localStorage.removeItem("usuario");
