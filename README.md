@@ -1,81 +1,200 @@
-# Gerenciador de Academia (MVP)
+# 🏋️‍♂️ Olympus Gym - Sistema de Gerenciamento de Academia
 
-Projeto inicial — backend em Flask, banco MySQL (via Docker) e frontend estático simples.
+Sistema web desenvolvido com **Flask + MySQL + Docker**, com funcionalidades de cadastro, login e dashboard de usuários.
 
-Como executar (local, sem Docker - rápido para desenvolvimento):
+---
 
-1. Crie e ative um ambiente virtual
+# 🚀 Tecnologias Utilizadas
 
-```powershell
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-```
+- Python (Flask)
+- MySQL
+- Docker & Docker Compose
+- HTML, CSS, JavaScript
+- Flask-CORS
 
-2. Configure o banco de dados e migrações (mesmo para local ou docker)
+---
 
-```powershell
-#& ".\.venv\Scripts\flask.exe" db migrate -m "initial migration"
-# se usando local com MySQL rodando na porta 3307 (docker-compose atual)
-$env:DATABASE_URI = "mysql+pymysql://root:password@localhost:3307/academia"
-$env:FLASK_APP = "run.py"
-flask db init
-flask db migrate -m "initial migration"
-flask db upgrade
-```
+# 📁 Estrutura do Projeto
 
-3. Opção A: Rode a aplicação local (sem Docker)
+gerenciador_academia/
 
-```powershell
-python run.py
-```
+├── backend/  
+│   ├── app.py  
+│   ├── requirements.txt  
 
-- URL local (app flask): http://localhost:5000
-- Endpoints locais:
-  - http://localhost:5000/api/health
-  - http://localhost:5000/api/db-check
-  - http://localhost:5000/api/members
+├── frontend/  
+│   ├── cadastro.html  
+│   ├── login.html  
+│   ├── dashboard.html  
+│   ├── js/  
+│   │   └── script.js  
+│   ├── css/  
+│   │   └── style.css  
 
-4. Opção B: Rode com Docker (app + MySQL)
+├── docker-compose.yml  
+└── Dockerfile  
 
-```bash
-docker compose up --build -d
-# aguarde o container iniciar e então:
-docker compose exec app flask db upgrade
-```
+---
 
-- URL docker: http://localhost:5001
-- Endpoints docker:
-  - http://localhost:5001/api/health
-  - http://localhost:5001/api/db-check
-  - http://localhost:5001/api/members
+# ⚙️ Como Rodar o Projeto
 
-5. Testar cadastro
+## 🔥 1. Clonar o repositório
 
-```powershell
-curl.exe -X POST "http://localhost:5001/api/members" `
-  -H "Content-Type: application/json" `
-  -d '{"name":"NOME","email":"email@x.com","phone":"123456"}'
+git clone <seu-repositorio>  
+cd gerenciador_academia  
 
-curl.exe "http://localhost:5001/api/members"
-```
+---
 
-6. Verificar dados no MySQL
+## 🐳 2. Subir o Docker
 
-```bash
-docker compose exec db mysql -uroot -ppassword -e "USE academia; SELECT * FROM member;"
-```
+docker-compose up --build  
 
+---
 
-Endpoints principais:
-- `GET /api/health` - health check
-- `GET /api/members` - listar membros
-- `POST /api/members` - criar membro (json: {name, email, phone})
+## 🌐 3. Acessar o sistema
 
-Próximos passos sugeridos:
-- Configurar migrations (`flask db init/migrate/upgrade`) e instruções no README
-- Implementar autenticação e autorização
-- Adicionar testes e CI
+Abra no navegador:
+
+http://localhost:5500/frontend/login.html  
+
+(ou use Live Server no VS Code)
+
+---
+
+# 🧠 Funcionalidades
+
+## 👤 Cadastro de Usuário
+- Nome, email e senha
+- Dados salvos no banco MySQL
+
+## 🔐 Login
+- Validação de credenciais
+- Retorno de dados do usuário
+- Armazenamento no localStorage
+
+## 🏠 Dashboard
+- Exibe nome do usuário logado
+- Simula funcionalidades:
+  - Treinos
+  - Agendamentos
+  - Progresso
+  - Planos
+
+## 🚪 Logout
+- Remove usuário da sessão
+- Redireciona para login
+
+## 🔒 Proteção de Rotas
+- Dashboard só acessível se estiver logado
+
+---
+
+# 🔗 Rotas da API
+
+## 📍 Rota Inicial
+GET /
+
+Resposta:
+API rodando 🚀
+
+---
+
+## 👤 Criar Usuário
+POST /usuarios
+
+Body:
+{
+  "nome": "Gabi",
+  "email": "gabi@email.com",
+  "senha": "123"
+}
+
+Resposta:
+{
+  "mensagem": "Usuário cadastrado com sucesso!"
+}
+
+---
+
+## 📋 Listar Usuários
+GET /usuarios
+
+Resposta:
+[
+  {
+    "id": 1,
+    "nome": "Gabi",
+    "email": "gabi@email.com"
+  }
+]
+
+👉 Como acessar no navegador:
+http://localhost:5000/usuarios
+
+---
+
+## 🔐 Login
+POST /login
+
+Body:
+{
+  "email": "gabi@email.com",
+  "senha": "123"
+}
+
+Resposta:
+{
+  "mensagem": "Login realizado com sucesso!",
+  "usuario": {
+    "id": 1,
+    "nome": "Gabi",
+    "email": "gabi@email.com"
+  }
+}
+
+---
+
+# 🗄️ Banco de Dados (MySQL)
+
+## Criar banco:
+CREATE DATABASE academia;
+
+## Criar tabela:
+USE academia;
+
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100),
+    email VARCHAR(100),
+    senha VARCHAR(100)
+);
+
+---
+
+# ⚠️ Observações
+
+- Backend roda na porta 5000
+- Frontend pode ser aberto com Live Server
+- Banco roda via Docker
+- Não precisa instalar MySQL localmente
+
+---
+
+# 🧪 Testes
+
+- Cadastro → Login → Dashboard
+- Pode usar Postman para testar API
+
+---
+
+# 💡 Melhorias Futuras
+
+- Autenticação com JWT
+- Criptografia de senha
+- CRUD completo
+- Dashboard com gráficos
+
+---
 
 Membros do projeto
 ------------------

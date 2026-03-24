@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - Olympus</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body onload="verificarLogin()">
+
+<div class="dashboard">
+
+  <header class="topbar">
+    <h2>🏋️ Olympus Gym</h2>
+
+    <div class="user-info">
+      <span id="nomeUsuario"></span>
+      <button onclick="logout()">Sair</button>
+    </div>
+  </header>
+
+  <main class="cards">
+
+    <div class="card">
+      <h3>💪 Treinos</h3>
+      <p>Acesse seus treinos personalizados</p>
+    </div>
+
+    <div class="card">
+      <h3>📅 Agendamentos</h3>
+      <p>Marque aulas e horários</p>
+    </div>
+
+    <div class="card">
+      <h3>📊 Progresso</h3>
+      <p>Acompanhe sua evolução</p>
+    </div>
+
+    <div class="card">
+      <h3>💳 Planos</h3>
+      <p>Veja ou altere seu plano</p>
+    </div>
+
+  </main>
+
+</div>
+
+<script src="js/script.js"></script>
+
+</body>
+</html>

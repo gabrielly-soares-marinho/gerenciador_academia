@@ -1,22 +1,31 @@
-version: '3.8'
+version: '3.9'
+
 services:
-  app:
+  backend:
     build: .
+    container_name: olympus_backend
     ports:
-      - "5001:5000"
-    environment:
-      - DATABASE_URI=mysql+pymysql://root:password@db:3306/academia
+      - "5000:5000"   # 🔥 libera o Flask no navegador
     depends_on:
       - db
-  db:
-    image: mysql:8.0
-    command: --default-authentication-plugin=mysql_native_password
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: academia
+      - DATABASE_URL=mysql+pymysql://root:root@db:3306/olympus
+    volumes:
+      - .:/app
+    working_dir: /app/backend
+    command: python app.py
+
+  db:
+    image: mysql:8
+    container_name: olympus_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: olympus
     ports:
       - "3307:3306"
     volumes:
       - db_data:/var/lib/mysql
+
 volumes:
   db_data:

@@ -1,46 +1,98 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Gerenciador de Academia - MVP</title>
-    <style>
-      body{font-family:Arial,Helvetica,sans-serif;padding:20px}
-      input,button{padding:8px;margin:4px}
-      .member{border-bottom:1px solid #ddd;padding:6px 0}
-    </style>
-  </head>
-  <body>
-    <h1>Gerenciador de Academia</h1>
-    <section>
-      <h2>Cadastrar aluno</h2>
-      <input id="name" placeholder="Nome" />
-      <input id="email" placeholder="Email" />
-      <button id="create">Criar</button>
-    </section>
+<head>
+  <meta charset="UTF-8">
+  <title>Olympus Academia</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
 
-    <section>
-      <h2>Alunos</h2>
-      <div id="members"></div>
-    </section>
+<body>
 
-    <script>
-      const api = '/api'
-      async function list(){
-        const res = await fetch(api + '/members')
-        const data = await res.json()
-        const c = document.getElementById('members')
-        c.innerHTML = data.map(m => `<div class="member">${m.name} &lt;${m.email || ''}&gt;</div>`).join('')
-      }
-      document.getElementById('create').addEventListener('click', async ()=>{
-        const name = document.getElementById('name').value
-        const email = document.getElementById('email').value
-        await fetch(api + '/members', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({name,email})})
-        document.getElementById('name').value=''
-        document.getElementById('email').value=''
-        list()
-      })
-      list()
-    </script>
-  </body>
+<!-- HEADER -->
+<header>
+  <img src="img/logo.png" width="120">
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Sobre</a>
+    <a href="#">Planos</a>
+    <button onclick="window.location.href='login.html'">Login</button>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <h1>Transforme seu corpo na <span>Olympus</span></h1>
+    <p>Treine com tecnologia e performance</p>
+    <button onclick="window.location.href='cadastro.html'">Começar</button>
+  </div>
+</section>
+
+<!-- SOBRE -->
+<section class="sobre">
+  <h1>Bem-vindo à OLYMPUS</h1>
+  <p>A sua academia premium com tecnologia e performance.</p>
+
+  <div class="cards">
+
+    <div class="card">
+      <img src="img/treino.jpeg">
+      <h3>Treinos Avançados</h3>
+    </div>
+
+    <div class="card">
+      <img src="img/academia.jpeg">
+      <h3>Ambiente Exclusivo</h3>
+    </div>
+
+    <div class="card">
+      <img src="img/app.png">
+      <h3>App Completo</h3>
+    </div>
+
+  </div>
+</section>
+
+<!-- PLANOS -->
+<section class="planos">
+  <h1>Nossos Planos</h1>
+
+  <div class="planos-container">
+
+    <div class="plano">
+      <h3>Básico</h3>
+      <p class="preco">R$ 79</p>
+      <button>Assinar</button>
+    </div>
+
+    <div class="plano destaque">
+      <h3>Premium</h3>
+      <p class="preco">R$ 129</p>
+      <button>Assinar</button>
+    </div>
+
+    <div class="plano">
+      <h3>VIP</h3>
+      <p class="preco">R$ 199</p>
+      <button>Assinar</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- LISTA USUÁRIOS -->
+<section class="usuarios">
+  <h1>Alunos Cadastrados</h1>
+  <button onclick="listarUsuarios()">Carregar</button>
+  <ul id="lista"></ul>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Olympus Academia</p>
+</footer>
+
+<script src="js/script.js"></script>
+
+</body>
 </html>
