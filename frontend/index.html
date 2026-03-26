@@ -10,7 +10,7 @@
 
 <!-- HEADER -->
 <header>
-  <img src="img/logo.png" width="120">
+  <img src="img/logo.png" width="100">
   <nav>
     <a href="#">Home</a>
     <a href="#">Sobre</a>
@@ -22,9 +22,17 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-text">
-    <h1>Transforme seu corpo na <span>Olympus</span></h1>
-    <p>Treine com tecnologia e performance</p>
-    <button onclick="window.location.href='cadastro.html'">Começar</button>
+    <h1>
+      TRANSFORME-SE NA<br>
+      <span>MELHOR VERSÃO</span><br>
+      <span>DE VOCÊ</span>
+    </h1>
+
+    <p>Treine na academia premium que leva seus resultados a outro nível.</p>
+
+    <button onclick="window.location.href='cadastro.html'">
+      COMEÇE AGORA
+    </button>
   </div>
 </section>
 
@@ -36,17 +44,17 @@
   <div class="cards">
 
     <div class="card">
-      <img src="img/treino.jpeg">
+      <img src="img/treino.jpeg" class="card-logo">
       <h3>Treinos Avançados</h3>
     </div>
 
     <div class="card">
-      <img src="img/academia.jpeg">
+      <img src="img/app.png" class="card-logo">
       <h3>Ambiente Exclusivo</h3>
     </div>
 
     <div class="card">
-      <img src="img/app.png">
+      <img src="img/hero.jpeg" class="card-logo">
       <h3>App Completo</h3>
     </div>
 
@@ -83,7 +91,7 @@
 <!-- LISTA USUÁRIOS -->
 <section class="usuarios">
   <h1>Alunos Cadastrados</h1>
-  <button onclick="listarUsuarios()">Carregar</button>
+  <button class="btn-amarelo" onclick="listarUsuarios()">Carregar</button>
   <ul id="lista"></ul>
 </section>
 

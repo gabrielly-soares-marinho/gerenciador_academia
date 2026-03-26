@@ -1,6 +1,6 @@
 # 🏋️‍♂️ Olympus Gym - Sistema de Gerenciamento de Academia
 
-Sistema web desenvolvido com **Flask + MySQL + Docker**, com funcionalidades de cadastro, login e dashboard de usuários.
+Sistema web desenvolvido com **Flask + MySQL + Docker**, com funcionalidades de cadastro, login, dashboard de usuários e logout.
 
 ---
 
@@ -14,33 +14,11 @@ Sistema web desenvolvido com **Flask + MySQL + Docker**, com funcionalidades de 
 
 ---
 
-# 📁 Estrutura do Projeto
-
-gerenciador_academia/
-
-├── backend/  
-│   ├── app.py  
-│   ├── requirements.txt  
-
-├── frontend/  
-│   ├── cadastro.html  
-│   ├── login.html  
-│   ├── dashboard.html  
-│   ├── js/  
-│   │   └── script.js  
-│   ├── css/  
-│   │   └── style.css  
-
-├── docker-compose.yml  
-└── Dockerfile  
-
----
-
 # ⚙️ Como Rodar o Projeto
 
 ## 🔥 1. Clonar o repositório
 
-git clone <seu-repositorio>  
+git clone (https://github.com/gabrielly-soares-marinho/gerenciador_academia.git) 
 cd gerenciador_academia  
 
 ---
@@ -51,15 +29,6 @@ docker-compose up --build
 
 ---
 
-## 🌐 3. Acessar o sistema
-
-Abra no navegador:
-
-http://localhost:5500/frontend/login.html  
-
-(ou use Live Server no VS Code)
-
----
 
 # 🧠 Funcionalidades
 
@@ -105,7 +74,7 @@ POST /usuarios
 Body:
 {
   "nome": "Gabi",
-  "email": "gabi@email.com",
+  "email": "gabi@gmail.com",
   "senha": "123"
 }
 
@@ -138,7 +107,7 @@ POST /login
 
 Body:
 {
-  "email": "gabi@email.com",
+  "email": "gabi@gmail.com",
   "senha": "123"
 }
 
@@ -148,13 +117,19 @@ Resposta:
   "usuario": {
     "id": 1,
     "nome": "Gabi",
-    "email": "gabi@email.com"
+    "email": "gabi@gmail.com"
   }
 }
 
 ---
 
 # 🗄️ Banco de Dados (MySQL)
+
+Entrar no MYSQL:
+docker exec -it olympus_db mysql -u root -p
+
+Digite a senha:
+root
 
 ## Criar banco:
 CREATE DATABASE academia;
@@ -168,6 +143,28 @@ CREATE TABLE usuarios (
     email VARCHAR(100),
     senha VARCHAR(100)
 );
+
+Testar se funcionou:
+SHOW DATABASES;
+
+USE academia;
+
+SHOW TABLES;
+
+Deve aparecer:
+usuarios
+
+Inserir um usuario (TESTE):
+INSERT INTO usuarios (nome, email, senha)
+VALUES ('Gabi', 'gabi@gmail.com', '123456');
+
+Ver dados:
+SELECT * FROM usuarios;
+
+Vai aparecer algo assim:
+
+1 | Gabi | gabi@email.com | 123456
+
 
 ---
 
