@@ -41,9 +41,27 @@
       <p>Veja ou altere seu plano</p>
     </div>
 
+    <!-- ✏️ EDITAR USUÁRIO -->
+    <div class="card card-editar">
+      <h3>⚙️ EDITAR PERFIL</h3>
+
+      <input type="text" id="editNome" placeholder="Novo nome">
+      <input type="email" id="editEmail" placeholder="Novo email">
+      <input type="password" id="editSenha" placeholder="Nova senha">
+
+      <button class="btn-amarelo" onclick="atualizarUsuario()">
+        Atualizar
+      </button>
+    </div>
+
   </main>
 
 </div>
+<button class="btn-amarelo" onclick="deletarUsuario()" style="background:red; color:white;">
+  Excluir Conta
+</button>
+
+<button class="btn-amarelo" onclick="irHome()">Home</button>
 
 <script src="js/script.js"></script>
 

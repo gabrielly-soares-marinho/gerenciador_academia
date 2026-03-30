@@ -29,29 +29,71 @@ docker-compose up --build
 
 ---
 
-
 # 🧠 Funcionalidades
 
 ## 👤 Cadastro de Usuário
-- Nome, email e senha
-- Dados salvos no banco MySQL
+- Permite criar uma nova conta
+- Campos obrigatórios:
+    Nome
+    Email
+    Senha
+- Validação de campos vazios
+- Salva os dados no banco de dados MySQL
+- Redireciona para tela de login após cadastro
 
 ## 🔐 Login
-- Validação de credenciais
-- Retorno de dados do usuário
-- Armazenamento no localStorage
+- Autentica o usuário com:
+    Email
+    Senha
+- Verifica os dados no banco
+- Em caso de sucesso:
+    Salva o usuário no localStorage
+    Redireciona para o dashboard
+- Em caso de erro:
+    Exibe mensagem de credenciais inválidas
+
+## 📋 Listar Usuários
+- Busca todos os usuários cadastrados no banco
+- Exibe na tela ao clicar em "Carregar"
+- Mostra:
+    Nome
+    Email
+- Atualiza a lista dinamicamente
 
 ## 🏠 Dashboard
 - Exibe nome do usuário logado
 - Simula funcionalidades:
-  - Treinos
-  - Agendamentos
-  - Progresso
-  - Planos
+    Treinos
+    Agendamentos
+    Progresso
+    Planos
+- Permite:
+    Atualizar dados
+    Deletar conta
+    Logout
+
+## ✏️ Atualizar Usuário
+- Permite editar:
+    Nome
+    Email
+    Senha
+- Utiliza o ID do usuário logado
+- Atualiza os dados no banco de dados
+- Atualiza também os dados no localStorage
+- Exibe mensagem de sucesso ou erro
 
 ## 🚪 Logout
 - Remove usuário da sessão
 - Redireciona para login
+
+## 🗑️ Deletar Usuário
+- Permite excluir a conta do usuário logado
+- Solicita confirmação antes da exclusão
+- Remove o usuário do banco de dados
+- Em caso de sucesso:
+    Remove o usuário do localStorage
+   Redireciona para tela de login
+- Exibe mensagem de sucesso ou erro
 
 ## 🔒 Proteção de Rotas
 - Dashboard só acessível se estiver logado
@@ -69,7 +111,8 @@ API rodando 🚀
 ---
 
 ## 👤 Criar Usuário
-POST /usuarios
+POST /cadastrar
+http://localhost:5000/cadastrar
 
 Body:
 {
@@ -86,7 +129,8 @@ Resposta:
 ---
 
 ## 📋 Listar Usuários
-GET /usuarios
+GET /listar
+http://localhost:5000/listar
 
 Resposta:
 [
@@ -97,13 +141,11 @@ Resposta:
   }
 ]
 
-👉 Como acessar no navegador:
-http://localhost:5000/usuarios
-
 ---
 
 ## 🔐 Login
 POST /login
+http://localhost:5000/login
 
 Body:
 {
@@ -119,6 +161,30 @@ Resposta:
     "nome": "Gabi",
     "email": "gabi@gmail.com"
   }
+}
+
+## ✏️ Atualizar Usuário
+PUT /atualizar/id
+http://localhost:5000/atualizar/13
+
+{
+  "nome": "Novo Nome",
+  "email": "novo@gmail.com",
+  "senha": "999999"
+}
+
+Resposta:
+{
+    "mensagem": "Usuário atualizado com sucesso!"
+}
+
+## 🗑️ Deletar Usuário
+DELETE /deletar/id
+http://localhost:5000/deletar/13
+
+Resposta:
+{
+    "mensagem": "Usuário deletado com sucesso!"
 }
 
 ---
@@ -165,7 +231,6 @@ Vai aparecer algo assim:
 
 1 | Gabi | gabi@email.com | 123456
 
-
 ---
 
 # ⚠️ Observações
@@ -179,7 +244,7 @@ Vai aparecer algo assim:
 
 # 🧪 Testes
 
-- Cadastro → Login → Dashboard
+- Cadastro → Listar → Login → Dashboard → Atualizar → Deletar
 - Pode usar Postman para testar API
 
 ---

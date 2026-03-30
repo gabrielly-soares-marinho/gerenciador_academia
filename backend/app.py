@@ -23,7 +23,7 @@ def home():
 
 
 # 👤 CADASTRO
-@app.route("/usuarios", methods=["POST"])
+@app.route("/cadastrar", methods=["POST"])
 def criar_usuario():
     try:
         data = request.get_json()
@@ -32,7 +32,6 @@ def criar_usuario():
         email = data.get("email")
         senha = data.get("senha")
 
-        # 🔒 validação básica
         if not nome or not email or not senha:
             return jsonify({"erro": "Preencha todos os campos"}), 400
 
@@ -99,7 +98,7 @@ def login():
 
 
 # 📋 LISTAR USUÁRIOS
-@app.route("/usuarios", methods=["GET"])
+@app.route("/listar", methods=["GET"])
 def listar_usuarios():
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -121,6 +120,66 @@ def listar_usuarios():
     return jsonify(resultado)
 
 
+# ✏️ ATUALIZAR USUÁRIO (CORRIGIDO)
+@app.route('/atualizar/<int:id>', methods=['PUT'])
+def atualizar_usuario(id):
+    try:
+        data = request.get_json()
+
+        nome = data.get('nome')
+        email = data.get('email')
+        senha = data.get('senha')
+
+        if not nome or not email or not senha:
+            return jsonify({"erro": "Preencha todos os campos"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE usuarios
+            SET nome = %s,
+                email = %s,
+                senha = %s
+            WHERE id = %s
+        """, (nome, email, senha, id))
+
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({"erro": "Usuário não encontrado"}), 404
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"mensagem": "Usuário atualizado com sucesso!"}), 200
+
+    except Exception as e:
+        print("ERRO:", e)
+        return jsonify({"erro": "Erro ao atualizar usuário"}), 500
+
+# 🗑️ DELETAR USUÁRIO
+@app.route('/deletar/<int:id>', methods=['DELETE'])
+def deletar_usuario(id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("DELETE FROM usuarios WHERE id = %s", (id,))
+        conn.commit()
+
+        if cursor.rowcount == 0:
+            return jsonify({"erro": "Usuário não encontrado"}), 404
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"mensagem": "Usuário deletado com sucesso!"}), 200
+
+    except Exception as e:
+        print("ERRO:", e)
+        return jsonify({"erro": "Erro ao deletar usuário"}), 500
+    
 # ▶️ RODAR
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
