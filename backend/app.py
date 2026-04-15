@@ -44,7 +44,6 @@ def criar_usuario():
         """, (nome, email, senha))
 
         conn.commit()
-
         cursor.close()
         conn.close()
 
@@ -109,18 +108,70 @@ def listar_usuarios():
     cursor.close()
     conn.close()
 
-    resultado = []
-    for u in usuarios:
-        resultado.append({
-            "id": u[0],
-            "nome": u[1],
-            "email": u[2]
+    return jsonify([
+        {"id": u[0], "nome": u[1], "email": u[2]}
+        for u in usuarios
+    ])
+
+
+# 🔍 BUSCAR USUÁRIO COM PLANO
+@app.route("/usuarios/<int:id>", methods=["GET"])
+def buscar_usuario(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT u.id, u.nome, u.email, u.plano_id, p.nome, p.descricao
+        FROM usuarios u
+        LEFT JOIN planos p ON u.plano_id = p.id
+        WHERE u.id = %s
+    """, (id,))
+
+    user = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if user:
+        return jsonify({
+            "id": user[0],
+            "nome": user[1],
+            "email": user[2],
+            "plano_id": user[3],
+            "plano_nome": user[4],
+            "plano_descricao": user[5]
         })
 
-    return jsonify(resultado)
+    return jsonify({"erro": "Usuário não encontrado"}), 404
 
 
-# ✏️ ATUALIZAR USUÁRIO (CORRIGIDO)
+# 🎯 ESCOLHER PLANO (AGORA FUNCIONA)
+@app.route("/usuarios/<int:id>/plano", methods=["PUT"])
+def escolher_plano(id):
+    try:
+        data = request.get_json()
+        plano_id = data.get("plano_id")
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE usuarios SET plano_id = %s WHERE id = %s
+        """, (plano_id, id))
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({"mensagem": "Plano atualizado!"})
+
+    except Exception as e:
+        print("ERRO:", e)
+        return jsonify({"erro": "Erro ao atualizar plano"}), 500
+
+
+# ✏️ ATUALIZAR USUÁRIO
 @app.route('/atualizar/<int:id>', methods=['PUT'])
 def atualizar_usuario(id):
     try:
@@ -146,17 +197,15 @@ def atualizar_usuario(id):
 
         conn.commit()
 
-        if cursor.rowcount == 0:
-            return jsonify({"erro": "Usuário não encontrado"}), 404
-
         cursor.close()
         conn.close()
 
-        return jsonify({"mensagem": "Usuário atualizado com sucesso!"}), 200
+        return jsonify({"mensagem": "Usuário atualizado com sucesso!"})
 
     except Exception as e:
         print("ERRO:", e)
         return jsonify({"erro": "Erro ao atualizar usuário"}), 500
+
 
 # 🗑️ DELETAR USUÁRIO
 @app.route('/deletar/<int:id>', methods=['DELETE'])
@@ -168,18 +217,16 @@ def deletar_usuario(id):
         cursor.execute("DELETE FROM usuarios WHERE id = %s", (id,))
         conn.commit()
 
-        if cursor.rowcount == 0:
-            return jsonify({"erro": "Usuário não encontrado"}), 404
-
         cursor.close()
         conn.close()
 
-        return jsonify({"mensagem": "Usuário deletado com sucesso!"}), 200
+        return jsonify({"mensagem": "Usuário deletado com sucesso!"})
 
     except Exception as e:
         print("ERRO:", e)
         return jsonify({"erro": "Erro ao deletar usuário"}), 500
-    
-# ▶️ RODAR
+
+
+# ▶️ SEMPRE POR ÚLTIMO
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

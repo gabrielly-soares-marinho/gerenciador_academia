@@ -403,3 +403,89 @@ footer {
 html {
   scroll-behavior: smooth;
 }
+
+/* PLANOS*/
+/* 🔥 FUNDO COM IMAGEM */
+.planos-body {
+  background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.9)),
+              url('../img/academia.jpeg') center/cover no-repeat;
+  min-height: 100vh;
+
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+/* 📦 CONTAINER */
+.planos-container {
+  text-align: center;
+  padding: 100px;
+}
+
+/* GRID */
+.planos-grid {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin-top: 60px;
+  flex-wrap: wrap;
+}
+
+/* CARD */
+.plano-card {
+  background: rgba(0, 0, 0, 0.9); /* 🔥 leve transparência pra ver o fundo */
+  padding: 50px;
+  border-radius: 12px;
+  width: 250px;
+  transition: 0.3s;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  backdrop-filter: blur(5px); /* ✨ efeito vidro moderno */
+}
+
+.plano-card:hover {
+  transform: scale(1.05);
+}
+
+
+/* TEXTO */
+.preco {
+  font-size: 22px;
+  margin: 10px 0;
+  color: #facc15;
+}
+
+.desc {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+/* BOTÃO */
+.plano-card button {
+  background: #facc15;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.plano-card button:hover {
+  background: #eab308;
+}
+
+/* VOLTAR */
+.btn-voltar {
+  margin-top: 30px;
+  background: transparent;
+  border: 1px solid rgb(251, 255, 0);
+  padding: 10px 100px;
+  color: white;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.btn-voltar:hover {
+  background: white;
+  color: black;
+}

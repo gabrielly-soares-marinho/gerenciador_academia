@@ -11,7 +11,7 @@ async function cadastrar(event) {
     try {
         const response = await fetch(`${API_URL}/cadastrar`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ nome, email, senha })
         });
 
@@ -24,11 +24,11 @@ async function cadastrar(event) {
             alert("❌ " + data.erro);
         }
 
-    } catch {
+    } catch (error) {
+        console.error(error);
         alert("Erro ao conectar com servidor");
     }
 }
-
 
 // 🔐 LOGIN
 async function login(event) {
@@ -40,7 +40,7 @@ async function login(event) {
     try {
         const response = await fetch(`${API_URL}/login`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ email, senha })
         });
 
@@ -53,13 +53,53 @@ async function login(event) {
             alert("❌ " + data.erro);
         }
 
-    } catch {
-        alert("Erro ao conectar");
+    } catch (error) {
+        console.error(error);
+        alert("Erro ao conectar com servidor");
     }
 }
 
+// 👀 VERIFICAR LOGIN + BUSCAR PLANO
+async function verificarLogin() {
+    const usuario = localStorage.getItem("usuario");
 
-// ✏️ ATUALIZAR USUÁRIO
+    if (!usuario) {
+        window.location.href = "login.html";
+        return;
+    }
+
+    const dados = JSON.parse(usuario);
+
+    // Nome
+    const nomeEl = document.getElementById("nomeUsuario");
+    if (nomeEl) nomeEl.innerText = dados.nome;
+
+    // 🔥 IMPORTANTE: aguardar resposta corretamente
+    try {
+        const response = await fetch(`${API_URL}/usuarios/${dados.id}`);
+
+        if (!response.ok) {
+            throw new Error("Erro ao buscar usuário");
+        }
+
+        const data = await response.json();
+
+        const planoEl = document.getElementById("planoAtual");
+
+        if (planoEl) {
+            if (data.plano_nome) {
+                planoEl.innerText = "Plano: " + data.plano_nome;
+            } else {
+                planoEl.innerText = "Nenhum plano selecionado";
+            }
+        }
+
+    } catch (error) {
+        console.error("Erro ao buscar plano:", error);
+    }
+}
+
+// ✏️ ATUALIZAR
 async function atualizarUsuario() {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
 
@@ -70,7 +110,7 @@ async function atualizarUsuario() {
     try {
         const response = await fetch(`${API_URL}/atualizar/${usuario.id}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({ nome, email, senha })
         });
 
@@ -79,7 +119,6 @@ async function atualizarUsuario() {
         if (response.ok) {
             alert("✅ " + data.mensagem);
 
-            // 🔄 atualiza localStorage
             usuario.nome = nome;
             usuario.email = email;
             localStorage.setItem("usuario", JSON.stringify(usuario));
@@ -89,35 +128,17 @@ async function atualizarUsuario() {
             alert("❌ " + data.erro);
         }
 
-    } catch {
+    } catch (error) {
+        console.error(error);
         alert("Erro ao atualizar usuário");
     }
 }
 
-
-// 👀 VERIFICAR LOGIN
-function verificarLogin() {
-    const usuario = localStorage.getItem("usuario");
-
-    if (!usuario) {
-        window.location.href = "login.html";
-    } else {
-        const dados = JSON.parse(usuario);
-
-        const nomeEl = document.getElementById("nomeUsuario");
-        if (nomeEl) {
-            nomeEl.innerText = dados.nome;
-        }
-    }
-}
-
-// 🗑️ DELETAR USUÁRIO
+// 🗑️ DELETAR
 async function deletarUsuario() {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-    const confirmar = confirm("Tem certeza que deseja excluir sua conta? 😢");
-
-    if (!confirmar) return;
+    if (!confirm("Tem certeza que deseja excluir?")) return;
 
     try {
         const response = await fetch(`${API_URL}/deletar/${usuario.id}`, {
@@ -128,28 +149,27 @@ async function deletarUsuario() {
 
         if (response.ok) {
             alert("✅ " + data.mensagem);
-
-            // limpa sessão
             localStorage.removeItem("usuario");
-
-            // volta pro login
             window.location.href = "login.html";
         } else {
             alert("❌ " + data.erro);
         }
 
-    } catch {
+    } catch (error) {
+        console.error(error);
         alert("Erro ao deletar usuário");
     }
 }
-// 🏠 IR PARA HOME
-function irHome() {
-    window.location.href = "index.html";
-}
+
 // 🚪 LOGOUT
 function logout() {
     localStorage.removeItem("usuario");
     window.location.href = "login.html";
+}
+
+// 🏠 HOME
+function irHome() {
+    window.location.href = "index.html";
 }
 
 // 📋 LISTAR USUÁRIOS
@@ -159,20 +179,58 @@ async function listarUsuarios() {
         const usuarios = await response.json();
 
         const lista = document.getElementById("lista");
-        lista.innerHTML = ""; // limpa antes
+        lista.innerHTML = "";
 
         usuarios.forEach(user => {
             const li = document.createElement("li");
-
-            li.innerHTML = `
-                <strong>${user.nome}</strong> - ${user.email}
-            `;
-
+            li.innerHTML = `<strong>${user.nome}</strong> - ${user.email}`;
             lista.appendChild(li);
         });
 
     } catch (error) {
-        alert("Erro ao carregar usuários");
         console.error(error);
+        alert("Erro ao carregar usuários");
     }
+}
+
+// 🔁 IR PARA PLANOS
+function irPlanos() {
+    window.location.href = "planos.html";
+}
+
+// 💳 ESCOLHER PLANO (CORRIGIDO)
+async function escolherPlano(plano_id) {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+    if (!usuario) {
+        alert("Usuário não logado");
+        return;
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/usuarios/${usuario.id}/plano`, {
+            method: "PUT",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ plano_id })
+        });
+
+        if (!response.ok) {
+            throw new Error("Erro na requisição");
+        }
+
+        const data = await response.json();
+
+        alert("✅ " + data.mensagem);
+
+        window.location.href = "dashboard.html";
+
+    } catch (error) {
+        console.error("Erro:", error);
+        alert("Erro ao conectar com servidor");
+    }
+}
+
+// 🔙 VOLTAR
+function voltarDashboard() {
+    window.location.href = "dashboard.html";
 }

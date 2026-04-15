@@ -36,9 +36,10 @@
       <p>Acompanhe sua evolução</p>
     </div>
 
-    <div class="card">
+    <!-- 💳 PLANOS -->
+    <div class="card" onclick="irPlanos()">
       <h3>💳 PLANOS</h3>
-      <p>Veja ou altere seu plano</p>
+      <p id="planoAtual">Carregando...</p>
     </div>
 
     <!-- ✏️ EDITAR USUÁRIO -->
@@ -57,6 +58,8 @@
   </main>
 
 </div>
+
+<!-- 🔥 AÇÕES EXTRAS -->
 <button class="btn-amarelo" onclick="deletarUsuario()" style="background:red; color:white;">
   Excluir Conta
 </button>
