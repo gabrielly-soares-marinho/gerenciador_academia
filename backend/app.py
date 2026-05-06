@@ -226,6 +226,102 @@ def deletar_usuario(id):
         print("ERRO:", e)
         return jsonify({"erro": "Erro ao deletar usuário"}), 500
 
+# 📚 LISTAR AULAS
+@app.route("/aulas", methods=["GET"])
+def listar_aulas():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM aulas")
+    aulas = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    resultado = []
+    for a in aulas:
+        resultado.append({
+            "id": a[0],
+            "nome": a[1],
+            "horario": a[2]
+        })
+
+    return jsonify(resultado)
+
+
+# 📅 AGENDAR AULA
+@app.route("/agendar", methods=["POST"])
+def agendar():
+    data = request.get_json()
+
+    usuario_id = data.get("usuario_id")
+    aula_id = data.get("aula_id")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO agendamentos (usuario_id, aula_id)
+        VALUES (%s, %s)
+    """, (usuario_id, aula_id))
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({"mensagem": "Agendamento realizado com sucesso!"})
+
+
+# 📋 MEUS AGENDAMENTOS
+@app.route("/meus-agendamentos/<int:usuario_id>", methods=["GET"])
+def meus_agendamentos(usuario_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT a.nome, a.horario, a.id
+        FROM agendamentos ag
+        JOIN aulas a ON ag.aula_id = a.id
+        WHERE ag.usuario_id = %s
+    """, (usuario_id,))
+
+    dados = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    resultado = []
+    for d in dados:
+        resultado.append({
+            "id": d[2],
+            "nome": d[0],
+            "horario": d[1]
+        })
+
+    return jsonify(resultado)
+
+@app.route("/cancelar-agendamento", methods=["DELETE"])
+def cancelar_agendamento():
+    data = request.get_json()
+
+    usuario_id = data.get("usuario_id")
+    aula_id = data.get("aula_id")
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        DELETE FROM agendamentos
+        WHERE usuario_id = %s AND aula_id = %s
+    """, (usuario_id, aula_id))
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return jsonify({"mensagem": "Agendamento cancelado com sucesso!"})
 
 # ▶️ SEMPRE POR ÚLTIMO
 if __name__ == "__main__":
