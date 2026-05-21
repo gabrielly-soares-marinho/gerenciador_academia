@@ -234,3 +234,11 @@ async function escolherPlano(plano_id) {
 function voltarDashboard() {
     window.location.href = "dashboard.html";
 }
+
+function iniciarTreino(nome) {
+    alert("Treino " + nome + " iniciado!");
+}
+
+function concluirTreino(card){
+    card.style.borderColor = "green";
+}

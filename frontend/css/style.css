@@ -567,3 +567,53 @@ html {
   background: rgba(255, 217, 0, 0.452);
   color: white;
 }
+
+/* ================= TREINOS ================= */
+
+.treinos-container {
+  display: grid;
+  grid-template-columns: repeat(2, 350px);
+  gap: 30px;
+
+  justify-content: center;
+
+  padding: 120px 20px 50px;
+}
+
+.treino-card {
+  background: rgba(0,0,0,0.75);
+  border: 2px solid gold;
+
+  border-radius: 20px;
+
+  padding: 25px;
+
+  backdrop-filter: blur(5px);
+
+  transition: 0.3s;
+}
+
+.treino-card:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 20px rgba(255,215,0,0.3);
+}
+
+.treino-card h3 {
+  color: gold;
+  margin-bottom: 20px;
+}
+
+.treino-card ul {
+  list-style: none;
+  margin-bottom: 20px;
+}
+
+.treino-card li {
+  margin: 10px 0;
+  color: #eee;
+  font-size: 17px;
+}
+
+.treino-card button {
+  width: 100%;
+}

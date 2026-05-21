@@ -264,3 +264,33 @@ Membros do projeto
 - Emilly Silva Eduardo Pereira - RA 2403751
 - Gabrielly Soares Marinho - RA 2403430
 - Maurício Monteiro Filho - RA 2302967
+
+
+SELECT 
+    usuarios.id,
+    usuarios.nome,
+    usuarios.email,
+    planos.nome AS plano,
+    aulas.nome AS aula,
+    aulas.horario
+FROM usuarios
+
+LEFT JOIN planos 
+ON usuarios.plano_id = planos.id
+
+LEFT JOIN agendamentos 
+ON usuarios.id = agendamentos.usuario_id
+
+LEFT JOIN aulas 
+ON agendamentos.aula_id = aulas.id;
+
+--------------------------
+
+SELECT 
+usuarios.nome AS Usuario,
+planos.nome AS Plano,
+aulas.nome AS Aula
+FROM usuarios
+LEFT JOIN planos ON usuarios.plano_id = planos.id
+LEFT JOIN agendamentos ON usuarios.id = agendamentos.usuario_id
+LEFT JOIN aulas ON agendamentos.aula_id = aulas.id;
