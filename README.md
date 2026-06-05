@@ -1,296 +1,555 @@
-# 🏋️‍♂️ Olympus Gym - Sistema de Gerenciamento de Academia
+# 🏋️ Olympus Gym - Sistema de Gerenciamento de Academia
 
-Sistema web desenvolvido com **Flask + MySQL + Docker**, com funcionalidades de cadastro, login, dashboard de usuários e logout.
+## 📖 Sobre o Projeto
+
+O Olympus Gym e um sistema web desenvolvido para auxiliar no gerenciamento de uma academia.
+
+O sistema permite que usuarios realizem:
+
+- Cadastro
+- Login
+- Atualizacao de perfil
+- Contratacao de planos
+- Pagamento via PIX (simulado)
+- Agendamento de aulas
+- Controle de treinos
+- Acompanhamento de progresso
+
+O projeto foi desenvolvido utilizando Flask no backend, MySQL como banco de dados e HTML, CSS e JavaScript no frontend.
 
 ---
 
 # 🚀 Tecnologias Utilizadas
 
-- Python (Flask)
-- MySQL
-- Docker & Docker Compose
-- HTML, CSS, JavaScript
+## Backend
+
+- Python 3.10
+- Flask
 - Flask-CORS
+- MySQL Connector Python
+
+## Banco de Dados
+
+- MySQL 8
+
+## Frontend
+
+- HTML5
+- CSS3
+- JavaScript
+
+## Containerizacao
+
+- Docker
+- Docker Compose
 
 ---
 
-# ⚙️ Como Rodar o Projeto
+# 📁 Estrutura do Projeto
 
-## 🔥 1. Clonar o repositório
+```text
+gerenciador_academia/
 
-git clone (https://github.com/gabrielly-soares-marinho/gerenciador_academia.git) 
-cd gerenciador_academia  
+│
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+├── run.py
+│
+├── backend
+│   ├── app.py
+│   ├── database.py
+│   └── models.py
+│
+└── frontend
+    │
+    ├── index.html
+    ├── login.html
+    ├── cadastro.html
+    ├── dashboard.html
+    ├── planos.html
+    ├── pagamentos.html
+    ├── pagamento-pix.html
+    ├── agendamentos.html
+    ├── treinos.html
+    ├── progresso.html
+    │
+    ├── css
+    │   └── style.css
+    │
+    ├── js
+    │   ├── script.js
+    │   ├── agendamentos.js
+    │   ├── pagamentos.js
+    │   ├── pix.js
+    │   ├── progresso.js
+    │   └── treinos.js
+    │
+    └── img
+        ├── academia.jpeg
+        ├── hero.jpeg
+        ├── treino.jpeg
+        ├── logo.png
+        ├── app.png
+        └── imgqrcode-pix.png
+```
 
 ---
 
-## 🐳 2. Subir o Docker
+# ⚙️ Como Executar o Projeto
 
-docker-compose up --build  
+## Pre-Requisitos
+
+Instalar:
+
+- Git
+- Docker Desktop
+- Docker Compose
 
 ---
 
-# 🧠 Funcionalidades
+## Clonar o Repositorio
 
-## 👤 Cadastro de Usuário
-- Permite criar uma nova conta
-- Campos obrigatórios:
-    Nome
-    Email
-    Senha
-- Validação de campos vazios
-- Salva os dados no banco de dados MySQL
-- Redireciona para tela de login após cadastro
+```bash
+git clone https://github.com/gabrielly-soares-marinho/gerenciador_academia.git
 
-## 🔐 Login
-- Autentica o usuário com:
-    Email
-    Senha
-- Verifica os dados no banco
-- Em caso de sucesso:
-    Salva o usuário no localStorage
-    Redireciona para o dashboard
-- Em caso de erro:
-    Exibe mensagem de credenciais inválidas
+cd gerenciador_academia
+```
 
-## 📋 Listar Usuários
-- Busca todos os usuários cadastrados no banco
-- Exibe na tela ao clicar em "Carregar"
-- Mostra:
-    Nome
-    Email
-- Atualiza a lista dinamicamente
+---
 
-## 🏠 Dashboard
-- Exibe nome do usuário logado
-- Simula funcionalidades:
-    Treinos
-    Agendamentos
-    Progresso
-    Planos
-- Permite:
-    Atualizar dados
-    Deletar conta
-    Logout
+## Construir e Executar os Containers
 
-## ✏️ Atualizar Usuário
-- Permite editar:
-    Nome
-    Email
-    Senha
-- Utiliza o ID do usuário logado
-- Atualiza os dados no banco de dados
-- Atualiza também os dados no localStorage
-- Exibe mensagem de sucesso ou erro
+```bash
+docker-compose up --build
+```
 
-## 🚪 Logout
-- Remove usuário da sessão
-- Redireciona para login
+---
 
-## 🗑️ Deletar Usuário
-- Permite excluir a conta do usuário logado
-- Solicita confirmação antes da exclusão
-- Remove o usuário do banco de dados
-- Em caso de sucesso:
-    Remove o usuário do localStorage
-   Redireciona para tela de login
-- Exibe mensagem de sucesso ou erro
+## Verificar Containers
 
-## 🔒 Proteção de Rotas
-- Dashboard só acessível se estiver logado
+```bash
+docker ps
+```
+
+Devera aparecer algo semelhante:
+
+```text
+olympus_backend
+olympus_db
+```
+
+---
+
+## Backend
+
+Disponivel em:
+
+```text
+http://localhost:5000
+```
+
+Teste:
+
+```text
+http://localhost:5000
+```
+
+Resposta esperada:
+
+```text
+API rodando
+```
+
+---
+
+## Frontend
+
+Abrir os arquivos HTML da pasta frontend.
+
+Pagina inicial:
+
+```text
+frontend/index.html
+```
+
+---
+
+# 🗄️ Banco de Dados
+
+Banco utilizado:
+
+```sql
+academia
+```
+
+---
+SHOW DATABASES;
+
+## Criar Banco
+
+```sql
+CREATE DATABASE academia;
+
+USE academia;
+```
+
+---
+
+## Tabela Usuarios
+
+```sql
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100),
+    email VARCHAR(100),
+    senha VARCHAR(100),
+    plano_id INT
+);
+```
+
+---
+
+## Tabela Planos
+
+```sql
+CREATE TABLE planos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(50),
+    descricao VARCHAR(100)
+);
+```
+
+---
+
+## Tabela Aulas
+
+```sql
+CREATE TABLE aulas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100),
+    horario VARCHAR(20)
+);
+```
+
+---
+
+## Tabela Agendamentos
+
+```sql
+CREATE TABLE agendamentos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario_id INT,
+    aula_id INT,
+
+    FOREIGN KEY (usuario_id)
+    REFERENCES usuarios(id),
+
+    FOREIGN KEY (aula_id)
+    REFERENCES aulas(id)
+);
+```
+
+---
+
+## Tabela Pagamentos
+
+```sql
+CREATE TABLE pagamentos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    usuario_id INT NOT NULL,
+    plano_id INT NOT NULL,
+
+    valor DECIMAL(10,2) NOT NULL,
+
+    status VARCHAR(20)
+    DEFAULT 'Pendente',
+
+    data_pagamento DATETIME,
+
+    FOREIGN KEY (usuario_id)
+    REFERENCES usuarios(id),
+
+    FOREIGN KEY (plano_id)
+    REFERENCES planos(id)
+);
+```
+
+---
+
+## Tabela Progresso
+
+```sql
+CREATE TABLE progresso (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    usuario_id INT,
+
+    peso DECIMAL(5,2),
+    gordura DECIMAL(5,2),
+    massa DECIMAL(5,2),
+
+    treinos_concluidos INT DEFAULT 0,
+
+    FOREIGN KEY (usuario_id)
+    REFERENCES usuarios(id)
+);
+```
+
+---
+
+## Tabela Treinos Concluidos
+
+```sql
+CREATE TABLE treinos_concluidos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    usuario_id INT,
+
+    treino_nome VARCHAR(100),
+
+    data_conclusao DATETIME,
+
+    FOREIGN KEY (usuario_id)
+    REFERENCES usuarios(id)
+);
+```
+
+---
+
+# 📅 Inserir Aulas
+
+```sql
+INSERT INTO aulas (nome, horario) VALUES
+('Danca', '08:00'),
+('Yoga', '10:00'),
+('Alongamento', '14:00'),
+('HIIT', '18:00'),
+('Pilates', '09:00'),
+('Funcional', '11:00'),
+('Jump', '15:00'),
+('Abdomen', '16:00'),
+('Mobilidade', '17:00'),
+('Sertanejo', '19:00');
+```
+
+---
+
+# 💳 Inserir Planos
+
+```sql
+INSERT INTO planos (nome, descricao)
+VALUES
+('Basico','Acesso limitado a academia'),
+('Intermediario','Acesso + aulas em grupo'),
+('Premium','Acesso total + personal trainer');
+```
+
+---
+
+# 🎯 Funcionalidades
+
+## Usuarios
+
+- Cadastro de usuarios
+- Login
+- Atualizacao de perfil
+- Exclusao de conta
+
+---
+
+## Planos
+
+- Escolha de plano
+- Plano ativo no dashboard
+- Visualizacao do plano contratado
+
+---
+
+## Pagamentos
+
+- Pagamento PIX simulado
+- QR Code PIX
+- Copiar codigo PIX
+- Confirmacao de pagamento
+- Ativacao automatica do plano
+
+---
+
+## Agendamentos
+
+- Listagem de aulas
+- Agendamento de aulas
+- Cancelamento de agendamentos
+- Consulta de agendamentos do usuario
+
+---
+
+## Treinos
+
+- Treinos personalizados
+- Iniciar treino
+- Concluir treino
+- Registro de treinos concluidos
+
+---
+
+## Progresso
+
+- Registro de peso
+- Controle de gordura corporal
+- Controle de massa muscular
+- Quantidade de treinos concluidos
+- Historico de evolucao
 
 ---
 
 # 🔗 Rotas da API
 
-## 📍 Rota Inicial
-GET /
+## Usuarios
 
-Resposta:
-API rodando 🚀
-
----
-
-## 👤 Criar Usuário
+```http
 POST /cadastrar
-http://localhost:5000/cadastrar
+```
 
-Body:
-{
-  "nome": "Gabi",
-  "email": "gabi@gmail.com",
-  "senha": "123"
-}
-
-Resposta:
-{
-  "mensagem": "Usuário cadastrado com sucesso!"
-}
-
----
-
-## 📋 Listar Usuários
-GET /listar
-http://localhost:5000/listar
-
-Resposta:
-[
-  {
-    "id": 1,
-    "nome": "Gabi",
-    "email": "gabi@email.com"
-  }
-]
-
----
-
-## 🔐 Login
+```http
 POST /login
-http://localhost:5000/login
+```
 
-Body:
-{
-  "email": "gabi@gmail.com",
-  "senha": "123"
-}
+```http
+GET /listar
+```
 
-Resposta:
-{
-  "mensagem": "Login realizado com sucesso!",
-  "usuario": {
-    "id": 1,
-    "nome": "Gabi",
-    "email": "gabi@gmail.com"
-  }
-}
+```http
+GET /usuarios/<id>
+```
 
-## ✏️ Atualizar Usuário
-PUT /atualizar/id
-http://localhost:5000/atualizar/13
+```http
+PUT /atualizar/<id>
+```
 
-{
-  "nome": "Novo Nome",
-  "email": "novo@gmail.com",
-  "senha": "999999"
-}
-
-Resposta:
-{
-    "mensagem": "Usuário atualizado com sucesso!"
-}
-
-## 🗑️ Deletar Usuário
-DELETE /deletar/id
-http://localhost:5000/deletar/13
-
-Resposta:
-{
-    "mensagem": "Usuário deletado com sucesso!"
-}
+```http
+DELETE /deletar/<id>
+```
 
 ---
 
-# 🗄️ Banco de Dados (MySQL)
+## Planos
 
-Entrar no MYSQL:
-docker exec -it olympus_db mysql -u root -p
+```http
+PUT /usuarios/<id>/plano
+```
 
-Digite a senha:
-root
+---
 
-## Criar banco:
-CREATE DATABASE academia;
+## Aulas
 
-## Criar tabela:
-USE academia;
+```http
+GET /aulas
+```
 
-CREATE TABLE usuarios (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100),
-    email VARCHAR(100),
-    senha VARCHAR(100)
-);
+---
 
-Testar se funcionou:
-SHOW DATABASES;
+## Agendamentos
 
-USE academia;
+```http
+POST /agendar
+```
 
-SHOW TABLES;
+```http
+GET /meus-agendamentos/<usuario_id>
+```
 
-Deve aparecer:
-usuarios
+```http
+DELETE /cancelar-agendamento
+```
 
-Inserir um usuario (TESTE):
-INSERT INTO usuarios (nome, email, senha)
-VALUES ('Gabi', 'gabi@gmail.com', '123456');
+---
 
-Ver dados:
+## Pagamentos
+
+```http
+POST /pagar
+```
+
+```http
+POST /pagar-plano
+```
+
+---
+
+# 🧪 Testando o Projeto
+
+## Cadastro
+
+1. Abrir cadastro.html
+2. Criar um usuario
+3. Verificar no banco:
+
+```sql
 SELECT * FROM usuarios;
-
-Vai aparecer algo assim:
-
-1 | Gabi | gabi@email.com | 123456
+```
 
 ---
 
-# ⚠️ Observações
+## Login
 
-- Backend roda na porta 5000
-- Frontend pode ser aberto com Live Server
-- Banco roda via Docker
-- Não precisa instalar MySQL localmente
+1. Fazer login
+2. Acessar dashboard
 
 ---
 
-# 🧪 Testes
+## Planos
 
-- Cadastro → Listar → Login → Dashboard → Atualizar → Deletar
-- Pode usar Postman para testar API
-
----
-
-# 💡 Melhorias Futuras
-
-- Autenticação com JWT
-- Criptografia de senha
-- CRUD completo
-- Dashboard com gráficos
+1. Selecionar um plano
+2. Realizar pagamento PIX simulado
+3. Confirmar pagamento
+4. Verificar plano ativo
 
 ---
 
-Membros do projeto
-------------------
+## Agendamentos
+
+1. Abrir tela de agendamentos
+2. Escolher uma aula
+3. Agendar
+4. Verificar no banco:
+
+```sql
+SELECT * FROM agendamentos;
+```
+
+---
+
+## Treinos
+
+1. Iniciar treino
+2. Concluir treino
+3. Verificar progresso
+
+---
+
+# 🔮 Melhorias Futuras
+
+- JWT Authentication
+- Upload de foto de perfil
+- Recuperacao de senha
+- Dashboard administrativo
+- Relatorios PDF
+- Integracao com PIX real
+- Integracao com Mercado Pago
+- Graficos de progresso
+- Notificacoes de vencimento de plano
+
+---
+
+# 👩‍💻 Desenvolvido por
 
 - Emilly Silva Eduardo Pereira - RA 2403751
 - Gabrielly Soares Marinho - RA 2403430
 - Maurício Monteiro Filho - RA 2302967
 
+Projeto academico desenvolvido para gerenciamento de academia utilizando Flask, MySQL, Docker e JavaScript.
+------------------
 
-SELECT 
-    usuarios.id,
-    usuarios.nome,
-    usuarios.email,
-    planos.nome AS plano,
-    aulas.nome AS aula,
-    aulas.horario
-FROM usuarios
-
-LEFT JOIN planos 
-ON usuarios.plano_id = planos.id
-
-LEFT JOIN agendamentos 
-ON usuarios.id = agendamentos.usuario_id
-
-LEFT JOIN aulas 
-ON agendamentos.aula_id = aulas.id;
-
---------------------------
-
-SELECT 
-usuarios.nome AS Usuario,
-planos.nome AS Plano,
-aulas.nome AS Aula
-FROM usuarios
-LEFT JOIN planos ON usuarios.plano_id = planos.id
-LEFT JOIN agendamentos ON usuarios.id = agendamentos.usuario_id
-LEFT JOIN aulas ON agendamentos.aula_id = aulas.id;

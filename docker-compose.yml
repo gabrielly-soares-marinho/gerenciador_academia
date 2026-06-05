@@ -21,7 +21,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: olympus
+      MYSQL_DATABASE: academia
     ports:
       - "3307:3306"
     volumes:

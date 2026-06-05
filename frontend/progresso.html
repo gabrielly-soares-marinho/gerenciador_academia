@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Progresso Olympus</title>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body onload="carregarProgresso()">
+
+<div class="dashboard">
+
+  <!-- TOPO -->
+  <header class="topbar">
+
+    <h2>PROGRESSO OLYMPUS</h2>
+
+    <div class="user-info">
+
+      <button class="btn-amarelo"
+      onclick="window.location.href='dashboard.html'">
+        Voltar
+      </button>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- CONTAINER -->
+  <main class="progresso-container">
+
+    <!-- TOTAL -->
+    <div class="progresso-card">
+
+      <h3>🏋️ Treinos Concluídos</h3>
+
+      <p id="totalTreinos">
+        0
+      </p>
+
+    </div>
+
+
+
+    <!-- ÚLTIMO TREINO -->
+    <div class="progresso-card">
+
+      <h3>🔥 Último Treino</h3>
+
+      <p id="ultimoTreino">
+        Nenhum
+      </p>
+
+    </div>
+
+
+
+    <!-- META -->
+    <div class="progresso-card">
+
+      <h3>🎯 Meta Mensal</h3>
+
+      <p id="metaTexto">
+        0 / 20
+      </p>
+
+      <div class="barra">
+
+        <div id="barraProgresso"
+        class="barra-interna">
+        </div>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- HISTÓRICO -->
+    <div class="progresso-card historico">
+
+      <h3>📅 Histórico</h3>
+
+      <div id="historico">
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script src="js/progresso.js"></script>
+
+</body>
+</html>

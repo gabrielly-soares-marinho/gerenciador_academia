@@ -87,12 +87,35 @@ async function verificarLogin() {
         const planoEl = document.getElementById("planoAtual");
 
         if (planoEl) {
+
+            const statusPlano =
+                document.getElementById(
+                    "statusPlano"
+                );
+
             if (data.plano_nome) {
-                planoEl.innerText = "Plano: " + data.plano_nome;
-            } else {
-                planoEl.innerText = "Nenhum plano selecionado";
+
+                planoEl.innerHTML =
+                    "🏆 " + data.plano_nome;
+
+                if(statusPlano){
+
+                    statusPlano.innerHTML =
+                        "✅ Plano Ativo";
+                }
+
+        } else {
+
+            planoEl.innerHTML =
+                "Nenhum plano ativo";
+
+            if(statusPlano){
+
+                statusPlano.innerHTML =
+                    "❌ Sem assinatura";
             }
         }
+    }
 
     } catch (error) {
         console.error("Erro ao buscar plano:", error);
@@ -198,36 +221,43 @@ function irPlanos() {
     window.location.href = "planos.html";
 }
 
-// 💳 ESCOLHER PLANO (CORRIGIDO)
 async function escolherPlano(plano_id) {
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
 
-    if (!usuario) {
-        alert("Usuário não logado");
-        return;
+    let planoNome = "";
+    let planoValor = "";
+
+    if(plano_id == 1){
+        planoNome = "Plano Básico";
+        planoValor = "R$ 49,00";
     }
 
-    try {
-        const response = await fetch(`${API_URL}/usuarios/${usuario.id}/plano`, {
-            method: "PUT",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ plano_id })
-        });
-
-        if (!response.ok) {
-            throw new Error("Erro na requisição");
-        }
-
-        const data = await response.json();
-
-        alert("✅ " + data.mensagem);
-
-        window.location.href = "dashboard.html";
-
-    } catch (error) {
-        console.error("Erro:", error);
-        alert("Erro ao conectar com servidor");
+    if(plano_id == 2){
+        planoNome = "Plano Intermediário";
+        planoValor = "R$ 79,00";
     }
+
+    if(plano_id == 3){
+        planoNome = "Plano Premium";
+        planoValor = "R$ 119,00";
+    }
+
+    localStorage.setItem(
+        "planoId",
+        plano_id
+    );
+
+    localStorage.setItem(
+        "planoNome",
+        planoNome
+    );
+
+    localStorage.setItem(
+        "planoValor",
+        planoValor
+    );
+
+    window.location.href =
+        "pagamento-pix.html";
 }
 
 // 🔙 VOLTAR

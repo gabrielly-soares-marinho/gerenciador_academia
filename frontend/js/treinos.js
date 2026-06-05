@@ -1,9 +1,7 @@
 function iniciarTreino(botao, treinoNome) {
 
-    // muda botão
     botao.innerText = "✅ Concluir Treino";
 
-    // muda função do botão
     botao.onclick = function () {
         concluirTreino(botao, treinoNome);
     };
@@ -12,26 +10,78 @@ function iniciarTreino(botao, treinoNome) {
 }
 
 
+
 function concluirTreino(botao, treinoNome) {
 
-    // pega card
     const card = botao.closest(".treino-card");
 
-    // muda visual
+    // visual concluído
     card.style.border = "2px solid lime";
 
-    // muda botão
     botao.innerText = "🏆 Treino Concluído";
 
-    // desabilita botão
     botao.disabled = true;
 
-    // muda aparência
     botao.style.background = "lime";
     botao.style.color = "black";
 
-    // salva no navegador
-    localStorage.setItem(treinoNome, "concluido");
+
+
+    // =========================
+    // SALVAR TREINO CONCLUÍDO
+    // =========================
+
+    // pega total atual
+    let totalTreinos =
+        localStorage.getItem("totalTreinos");
+
+    // se não existir
+    if (!totalTreinos) {
+        totalTreinos = 0;
+    }
+
+    // soma +1
+    totalTreinos++;
+
+    // salva novo total
+    localStorage.setItem(
+        "totalTreinos",
+        totalTreinos
+    );
+
+
+
+    // =========================
+    // SALVAR ÚLTIMO TREINO
+    // =========================
+
+    localStorage.setItem(
+        "ultimoTreino",
+        treinoNome
+    );
+
+
+
+    // =========================
+    // HISTÓRICO
+    // =========================
+
+    let historico =
+        JSON.parse(
+            localStorage.getItem("historicoTreinos")
+        ) || [];
+
+    historico.push({
+        treino: treinoNome,
+        data: new Date().toLocaleString()
+    });
+
+    localStorage.setItem(
+        "historicoTreinos",
+        JSON.stringify(historico)
+    );
+
+
 
     alert("💪 Treino concluído com sucesso!");
 }

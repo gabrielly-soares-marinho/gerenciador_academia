@@ -323,6 +323,131 @@ def cancelar_agendamento():
 
     return jsonify({"mensagem": "Agendamento cancelado com sucesso!"})
 
+# 💳 REALIZAR PAGAMENTO
+@app.route("/pagar", methods=["POST"])
+def pagar():
+
+    try:
+
+        data = request.get_json()
+
+        usuario_id = data.get("usuario_id")
+        plano_id = data.get("plano_id")
+        valor = data.get("valor")
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO pagamentos
+            (usuario_id, plano_id, valor, status, data_pagamento)
+
+            VALUES
+            (%s, %s, %s, 'Pago', NOW())
+        """,
+        (
+            usuario_id,
+            plano_id,
+            valor
+        ))
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "mensagem": "Pagamento realizado com sucesso!"
+        })
+
+    except Exception as e:
+
+        print("ERRO:", e)
+
+        return jsonify({
+            "erro": "Erro ao processar pagamento"
+        }), 500
+
+# 📋 LISTAR PAGAMENTOS
+@app.route("/pagamentos/<int:usuario_id>", methods=["GET"])
+def listar_pagamentos(usuario_id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            p.id,
+            p.valor,
+            p.status,
+            p.data_pagamento,
+            pl.nome
+
+        FROM pagamentos p
+
+        JOIN planos pl
+        ON p.plano_id = pl.id
+
+        WHERE p.usuario_id = %s
+    """, (usuario_id,))
+
+    pagamentos = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    resultado = []
+
+    for p in pagamentos:
+
+        resultado.append({
+            "id": p[0],
+            "valor": float(p[1]),
+            "status": p[2],
+            "data": str(p[3]),
+            "plano": p[4]
+        })
+
+    return jsonify(resultado)
+
+# 💳 CONFIRMAR PAGAMENTO
+@app.route("/pagar-plano", methods=["POST"])
+def pagar_plano():
+
+    try:
+
+        data = request.get_json()
+
+        usuario_id = data.get("usuario_id")
+        plano_id = data.get("plano_id")
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            UPDATE usuarios
+            SET plano_id = %s
+            WHERE id = %s
+        """, (plano_id, usuario_id))
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "mensagem":
+            "Pagamento confirmado e plano ativado!"
+        })
+
+    except Exception as e:
+
+        print(e)
+
+        return jsonify({
+            "erro":"Erro ao processar pagamento"
+        }), 500
+
 # ▶️ SEMPRE POR ÚLTIMO
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
