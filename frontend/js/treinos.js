@@ -13,6 +13,10 @@ function iniciarTreino(botao, treinoNome) {
 
 function concluirTreino(botao, treinoNome) {
 
+    const usuario = JSON.parse(
+        localStorage.getItem("usuario")
+    );
+
     const card = botao.closest(".treino-card");
 
     // visual concluído
@@ -31,21 +35,19 @@ function concluirTreino(botao, treinoNome) {
     // SALVAR TREINO CONCLUÍDO
     // =========================
 
-    // pega total atual
     let totalTreinos =
-        localStorage.getItem("totalTreinos");
+        localStorage.getItem(
+            `totalTreinos_${usuario.id}`
+        );
 
-    // se não existir
     if (!totalTreinos) {
         totalTreinos = 0;
     }
 
-    // soma +1
     totalTreinos++;
 
-    // salva novo total
     localStorage.setItem(
-        "totalTreinos",
+        `totalTreinos_${usuario.id}`,
         totalTreinos
     );
 
@@ -56,7 +58,7 @@ function concluirTreino(botao, treinoNome) {
     // =========================
 
     localStorage.setItem(
-        "ultimoTreino",
+        `ultimoTreino_${usuario.id}`,
         treinoNome
     );
 
@@ -68,7 +70,9 @@ function concluirTreino(botao, treinoNome) {
 
     let historico =
         JSON.parse(
-            localStorage.getItem("historicoTreinos")
+            localStorage.getItem(
+                `historicoTreinos_${usuario.id}`
+            )
         ) || [];
 
     historico.push({
@@ -77,7 +81,7 @@ function concluirTreino(botao, treinoNome) {
     });
 
     localStorage.setItem(
-        "historicoTreinos",
+        `historicoTreinos_${usuario.id}`,
         JSON.stringify(historico)
     );
 

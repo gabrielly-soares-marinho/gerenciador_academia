@@ -1008,3 +1008,15 @@ html {
 
     color:lime;
 }
+
+.treino-card {
+    width: 350px;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.treino-card ul {
+    flex: 1;
+}

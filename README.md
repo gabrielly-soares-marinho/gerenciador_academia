@@ -189,14 +189,20 @@ SHOW DATABASES;
 ## Criar Banco
 
 ```sql
+DROP DATABASE IF EXISTS academia;
+
 CREATE DATABASE academia;
 
 USE academia;
+
 ```
 
+SHOW TABLES;
 ---
 
-## Tabela Usuarios
+## Tabela Usuarios 
+
+SELECT * FROM usuarios;
 
 ```sql
 CREATE TABLE usuarios (
@@ -212,6 +218,8 @@ CREATE TABLE usuarios (
 
 ## Tabela Planos
 
+SELECT * FROM planos;
+
 ```sql
 CREATE TABLE planos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -224,6 +232,8 @@ CREATE TABLE planos (
 
 ## Tabela Aulas
 
+SELECT * FROM aulas;
+
 ```sql
 CREATE TABLE aulas (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -235,6 +245,8 @@ CREATE TABLE aulas (
 ---
 
 ## Tabela Agendamentos
+
+SELECT * FROM agendamentos;
 
 ```sql
 CREATE TABLE agendamentos (
@@ -253,6 +265,8 @@ CREATE TABLE agendamentos (
 ---
 
 ## Tabela Pagamentos
+
+SELECT * FROM pagamentos;
 
 ```sql
 CREATE TABLE pagamentos (
@@ -280,6 +294,8 @@ CREATE TABLE pagamentos (
 
 ## Tabela Progresso
 
+SELECT * FROM progresso;
+
 ```sql
 CREATE TABLE progresso (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -300,6 +316,8 @@ CREATE TABLE progresso (
 ---
 
 ## Tabela Treinos Concluidos
+
+SELECT * FROM treinos_concluidos;
 
 ```sql
 CREATE TABLE treinos_concluidos (

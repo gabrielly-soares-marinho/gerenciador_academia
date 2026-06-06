@@ -1,11 +1,17 @@
 function carregarProgresso() {
 
+    const usuario = JSON.parse(
+        localStorage.getItem("usuario")
+    );
+
     // =========================
     // TOTAL TREINOS
     // =========================
 
     let total =
-        localStorage.getItem("totalTreinos");
+        localStorage.getItem(
+            `totalTreinos_${usuario.id}`
+        );
 
     if (!total) {
         total = 0;
@@ -22,7 +28,9 @@ function carregarProgresso() {
     // =========================
 
     let ultimo =
-        localStorage.getItem("ultimoTreino");
+        localStorage.getItem(
+            `ultimoTreino_${usuario.id}`
+        );
 
     if (!ultimo) {
         ultimo = "Nenhum treino";
@@ -47,7 +55,6 @@ function carregarProgresso() {
 
 
 
-    // porcentagem
     let porcentagem =
         (total / meta) * 100;
 
@@ -68,7 +75,9 @@ function carregarProgresso() {
 
     let historico =
         JSON.parse(
-            localStorage.getItem("historicoTreinos")
+            localStorage.getItem(
+                `historicoTreinos_${usuario.id}`
+            )
         ) || [];
 
     let html = "";
