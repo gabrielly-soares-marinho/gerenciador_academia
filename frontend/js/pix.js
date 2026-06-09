@@ -32,10 +32,39 @@ async function confirmarPagamento() {
     const plano_id =
         localStorage.getItem("planoId");
 
+    let valor = 0;
+
+    if (plano_id == "1") valor = 49;
+    if (plano_id == "2") valor = 79;
+    if (plano_id == "3") valor = 119;
+
     try {
 
-        const response = await fetch(
-            `http://localhost:5000/pagar-plano`,
+        // SALVA NA TABELA PAGAMENTOS
+        const pagamento = await fetch(
+            "http://localhost:5000/pagar",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                    usuario_id: usuario.id,
+                    plano_id: plano_id,
+                    valor: valor
+                })
+            }
+        );
+
+        if (!pagamento.ok) {
+
+            alert("Erro ao registrar pagamento");
+            return;
+        }
+
+        // ATIVA O PLANO
+        const ativarPlano = await fetch(
+            "http://localhost:5000/pagar-plano",
             {
                 method: "POST",
                 headers: {
@@ -48,22 +77,21 @@ async function confirmarPagamento() {
             }
         );
 
-        const data = await response.json();
+        if (!ativarPlano.ok) {
 
-        alert(data.mensagem);
+            alert("Erro ao ativar plano");
+            return;
+        }
+
+        alert("✅ Pagamento confirmado!");
 
         window.location.href =
             "dashboard.html";
 
     } catch(err){
 
+        console.error(err);
+
         alert("Erro ao confirmar pagamento");
     }
-}
-
-
-function voltarPlanos() {
-
-    window.location.href =
-        "planos.html";
 }

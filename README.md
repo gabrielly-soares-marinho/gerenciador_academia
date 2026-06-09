@@ -184,7 +184,12 @@ academia
 ```
 
 ---
+Entrar no banco:
+docker exec -it olympus_db mysql -u root -p
+Senha: root
 SHOW DATABASES;
+USE academia
+SHOW TABLES;
 
 ## Criar Banco
 

@@ -448,6 +448,162 @@ def pagar_plano():
             "erro":"Erro ao processar pagamento"
         }), 500
 
+
+# 📊 BUSCAR PROGRESSO
+@app.route("/progresso/<int:usuario_id>", methods=["GET"])
+def buscar_progresso(usuario_id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            treinos_concluidos,
+            percentual
+        FROM progresso
+        WHERE usuario_id = %s
+    """, (usuario_id,))
+
+    progresso = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if progresso:
+
+        return jsonify({
+            "treinos": progresso[0],
+            "percentual": progresso[1]
+        })
+
+    return jsonify({
+        "treinos": 0,
+        "percentual": 0
+    })
+
+# 💪 CONCLUIR TREINO
+@app.route("/concluir-treino", methods=["POST"])
+def concluir_treino():
+
+    try:
+
+        data = request.get_json()
+
+        usuario_id = data.get("usuario_id")
+        treino = data.get("treino")
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            INSERT INTO treinos_concluidos
+            (usuario_id, treino_nome)
+            VALUES (%s, %s)
+        """, (
+            usuario_id,
+            treino
+        ))
+
+        cursor.execute("""
+            SELECT id, treinos_concluidos
+            FROM progresso
+            WHERE usuario_id = %s
+        """, (usuario_id,))
+
+        progresso = cursor.fetchone()
+
+        if progresso:
+
+            novo_total = progresso[1] + 1
+
+            percentual = int(
+                (novo_total / 20) * 100
+            )
+
+            if percentual > 100:
+                percentual = 100
+
+            cursor.execute("""
+                UPDATE progresso
+                SET treinos_concluidos = %s,
+                    percentual = %s
+                WHERE usuario_id = %s
+            """, (
+                novo_total,
+                percentual,
+                usuario_id
+            ))
+
+        else:
+
+            cursor.execute("""
+                INSERT INTO progresso
+                (
+                    usuario_id,
+                    treinos_concluidos,
+                    carga_total,
+                    peso,
+                    percentual
+                )
+                VALUES
+                (
+                    %s,
+                    1,
+                    0,
+                    0,
+                    5
+                )
+            """, (usuario_id,))
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "mensagem":
+            "Treino salvo com sucesso!"
+        })
+
+    except Exception as e:
+
+        print("ERRO:", e)
+
+        return jsonify({
+            "erro":
+            "Erro ao salvar treino"
+        }), 500
+
+# HISTORICO DE TREINOS
+@app.route("/historico-treinos/<int:usuario_id>", methods=["GET"])
+def historico_treinos(usuario_id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT treino_nome, data_conclusao
+        FROM treinos_concluidos
+        WHERE usuario_id = %s
+        ORDER BY data_conclusao DESC
+    """, (usuario_id,))
+
+    treinos = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    resultado = []
+
+    for treino in treinos:
+
+        resultado.append({
+            "treino": treino[0],
+            "data": str(treino[1])
+        })
+
+    return jsonify(resultado)
+
 # ▶️ SEMPRE POR ÚLTIMO
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

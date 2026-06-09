@@ -1,99 +1,86 @@
-function carregarProgresso() {
+async function carregarProgresso() {
 
-    const usuario = JSON.parse(
-        localStorage.getItem("usuario")
-    );
-
-    // =========================
-    // TOTAL TREINOS
-    // =========================
-
-    let total =
-        localStorage.getItem(
-            `totalTreinos_${usuario.id}`
-        );
-
-    if (!total) {
-        total = 0;
-    }
-
-    document.getElementById(
-        "totalTreinos"
-    ).innerText = total;
-
-
-
-    // =========================
-    // ÚLTIMO TREINO
-    // =========================
-
-    let ultimo =
-        localStorage.getItem(
-            `ultimoTreino_${usuario.id}`
-        );
-
-    if (!ultimo) {
-        ultimo = "Nenhum treino";
-    }
-
-    document.getElementById(
-        "ultimoTreino"
-    ).innerText = ultimo;
-
-
-
-    // =========================
-    // META
-    // =========================
-
-    const meta = 20;
-
-    document.getElementById(
-        "metaTexto"
-    ).innerText =
-        total + " / " + meta;
-
-
-
-    let porcentagem =
-        (total / meta) * 100;
-
-    if (porcentagem > 100) {
-        porcentagem = 100;
-    }
-
-    document.getElementById(
-        "barraProgresso"
-    ).style.width =
-        porcentagem + "%";
-
-
-
-    // =========================
-    // HISTÓRICO
-    // =========================
-
-    let historico =
+    const usuario =
         JSON.parse(
-            localStorage.getItem(
-                `historicoTreinos_${usuario.id}`
-            )
-        ) || [];
+            localStorage.getItem("usuario")
+        );
 
-    let html = "";
+    try {
 
-    historico.reverse().forEach(item => {
+        const response =
+            await fetch(
+                `http://localhost:5000/progresso/${usuario.id}`
+            );
 
-        html += `
-            <div class="historico-item">
-                ✅ ${item.treino}
-                <br>
-                <small>${item.data}</small>
-            </div>
-        `;
-    });
+        const data =
+            await response.json();
 
-    document.getElementById(
-        "historico"
-    ).innerHTML = html;
+        document.getElementById(
+            "totalTreinos"
+        ).innerText =
+            data.treinos;
+
+        document.getElementById(
+            "ultimoTreino"
+        ).innerText =
+            "Ver histórico abaixo";
+
+        document.getElementById(
+            "metaTexto"
+        ).innerText =
+            data.treinos + " / 20";
+
+        document.getElementById(
+            "barraProgresso"
+        ).style.width =
+            data.percentual + "%";
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+    carregarHistorico();
+}
+
+async function carregarHistorico() {
+
+    const usuario =
+        JSON.parse(
+            localStorage.getItem("usuario")
+        );
+
+    try {
+
+        const response =
+            await fetch(
+                `http://localhost:5000/historico-treinos/${usuario.id}`
+            );
+
+        const historico =
+            await response.json();
+
+        let html = "";
+
+        historico.forEach(item => {
+
+            html += `
+                <div class="historico-item">
+                    ✅ ${item.treino}
+                    <br>
+                    <small>${item.data}</small>
+                </div>
+            `;
+        });
+
+        document.getElementById(
+            "historico"
+        ).innerHTML = html;
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
 }

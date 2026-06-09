@@ -2,42 +2,72 @@ const API_URL = "http://localhost:5000";
 
 window.onload = function () {
 
-    const planoId = localStorage.getItem("planoSelecionado");
+    const planoId =
+        localStorage.getItem("planoSelecionado");
 
-    const nomePlano = document.getElementById("nomePlano");
-    const valorPlano = document.getElementById("valorPlano");
+    const nomePlano =
+        document.getElementById("nomePlano");
+
+    const valorPlano =
+        document.getElementById("valorPlano");
 
     if (!planoId) {
-        nomePlano.innerText = "Nenhum plano selecionado";
-        valorPlano.innerText = "R$ 0,00";
+
+        nomePlano.innerText =
+            "Nenhum plano selecionado";
+
+        valorPlano.innerText =
+            "R$ 0,00";
+
         return;
     }
 
     if (planoId == "1") {
-        nomePlano.innerText = "🥉 Plano Básico";
-        valorPlano.innerText = "R$ 49,00";
+
+        nomePlano.innerText =
+            "🥉 Plano Básico";
+
+        valorPlano.innerText =
+            "R$ 49,00";
     }
 
     if (planoId == "2") {
-        nomePlano.innerText = "🥈 Plano Intermediário";
-        valorPlano.innerText = "R$ 79,00";
+
+        nomePlano.innerText =
+            "🥈 Plano Intermediário";
+
+        valorPlano.innerText =
+            "R$ 79,00";
     }
 
     if (planoId == "3") {
-        nomePlano.innerText = "🥇 Plano Premium";
-        valorPlano.innerText = "R$ 119,00";
+
+        nomePlano.innerText =
+            "🥇 Plano Premium";
+
+        valorPlano.innerText =
+            "R$ 119,00";
     }
 };
 
-
 async function realizarPagamento() {
 
-    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    const usuario =
+        JSON.parse(
+            localStorage.getItem("usuario")
+        );
 
-    const plano_id = localStorage.getItem("planoSelecionado");
+    const plano_id =
+        localStorage.getItem(
+            "planoSelecionado"
+        );
 
     if (!usuario || !plano_id) {
-        alert("Erro ao localizar plano.");
+
+        alert(
+            "Erro ao localizar plano."
+        );
+
         return;
     }
 
@@ -49,41 +79,83 @@ async function realizarPagamento() {
 
     try {
 
-        const response = await fetch(`${API_URL}/pagar`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                usuario_id: usuario.id,
-                plano_id: plano_id,
-                valor: valor
-            })
-        });
+        const pagamento =
+            await fetch(
+                `${API_URL}/pagar`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                        "application/json"
+                    },
+                    body: JSON.stringify({
+                        usuario_id: usuario.id,
+                        plano_id: plano_id,
+                        valor: valor
+                    })
+                }
+            );
 
-        const data = await response.json();
+        if (!pagamento.ok) {
 
-        if (response.ok) {
+            alert(
+                "Erro ao registrar pagamento"
+            );
 
-            alert("✅ Pagamento realizado com sucesso!");
-
-            document.getElementById("statusPagamento").innerHTML =
-                "✔ Plano ativado com sucesso";
-
-            localStorage.removeItem("planoSelecionado");
-
-            setTimeout(() => {
-                window.location.href = "dashboard.html";
-            }, 1500);
-
-        } else {
-
-            alert(data.erro);
+            return;
         }
+
+        const ativarPlano =
+            await fetch(
+                `${API_URL}/pagar-plano`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type":
+                        "application/json"
+                    },
+                    body: JSON.stringify({
+                        usuario_id: usuario.id,
+                        plano_id: plano_id
+                    })
+                }
+            );
+
+        if (!ativarPlano.ok) {
+
+            alert(
+                "Erro ao ativar plano"
+            );
+
+            return;
+        }
+
+        document.getElementById(
+            "statusPagamento"
+        ).innerHTML =
+            "✔ Plano ativado com sucesso";
+
+        localStorage.removeItem(
+            "planoSelecionado"
+        );
+
+        alert(
+            "✅ Pagamento realizado com sucesso!"
+        );
+
+        setTimeout(() => {
+
+            window.location.href =
+                "dashboard.html";
+
+        }, 1500);
 
     } catch (error) {
 
         console.error(error);
-        alert("Erro ao processar pagamento");
+
+        alert(
+            "Erro ao processar pagamento"
+        );
     }
 }

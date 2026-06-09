@@ -9,8 +9,6 @@ function iniciarTreino(botao, treinoNome) {
     alert("🔥 Treino " + treinoNome + " iniciado!");
 }
 
-
-
 function concluirTreino(botao, treinoNome) {
 
     const usuario = JSON.parse(
@@ -19,7 +17,6 @@ function concluirTreino(botao, treinoNome) {
 
     const card = botao.closest(".treino-card");
 
-    // visual concluído
     card.style.border = "2px solid lime";
 
     botao.innerText = "🏆 Treino Concluído";
@@ -29,10 +26,8 @@ function concluirTreino(botao, treinoNome) {
     botao.style.background = "lime";
     botao.style.color = "black";
 
-
-
     // =========================
-    // SALVAR TREINO CONCLUÍDO
+    // TOTAL TREINOS
     // =========================
 
     let totalTreinos =
@@ -51,18 +46,14 @@ function concluirTreino(botao, treinoNome) {
         totalTreinos
     );
 
-
-
     // =========================
-    // SALVAR ÚLTIMO TREINO
+    // ÚLTIMO TREINO
     // =========================
 
     localStorage.setItem(
         `ultimoTreino_${usuario.id}`,
         treinoNome
     );
-
-
 
     // =========================
     // HISTÓRICO
@@ -85,7 +76,31 @@ function concluirTreino(botao, treinoNome) {
         JSON.stringify(historico)
     );
 
+    // =========================
+    // BANCO DE DADOS
+    // =========================
 
+    fetch("http://localhost:5000/concluir-treino", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            usuario_id: usuario.id,
+            treino: treinoNome
+        })
+
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(error => {
+        console.error(error);
+    });
 
     alert("💪 Treino concluído com sucesso!");
 }
