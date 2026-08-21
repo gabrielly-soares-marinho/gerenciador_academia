@@ -272,3 +272,41 @@ function iniciarTreino(nome) {
 function concluirTreino(card){
     card.style.borderColor = "green";
 }
+
+// 🎯 QUIZ - DESCOBRIR TREINO IDEAL
+function irQuiz() {
+
+    const usuario = JSON.parse(
+        localStorage.getItem("usuario")
+    );
+
+    if (!usuario) {
+
+        alert("Você precisa estar logado!");
+
+        window.location.href = "login.html";
+
+        return;
+    }
+
+    window.location.href =
+        "quiz-treino.html";
+}
+
+// 🎯 QUIZ - DESCOBRIR TREINO IDEAL
+
+function irQuiz() {
+
+    const usuario = JSON.parse(
+        localStorage.getItem("usuario")
+    );
+
+    if (!usuario) {
+        alert("Você precisa estar logado!");
+        window.location.href = "login.html";
+        return;
+    }
+
+    window.location.href =
+        "quiz-treino.html";
+}

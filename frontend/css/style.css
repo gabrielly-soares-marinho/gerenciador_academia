@@ -1020,3 +1020,655 @@ html {
 .treino-card ul {
     flex: 1;
 }
+
+/* ==========================================================
+   AVALIAÇÃO DE AULA
+   ========================================================== */
+
+.avaliacao-container {
+
+    width: 100%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 50px 20px;
+
+}
+
+
+.avaliacao-card {
+
+    width: 500px;
+
+    max-width: 90%;
+
+    background: rgba(0, 0, 0, 0.85);
+
+    border: 2px solid #ffd900;
+
+    border-radius: 20px;
+
+    padding: 35px;
+
+    text-align: center;
+
+    box-shadow:
+        0 0 15px rgba(255, 217, 0, 0.3);
+
+}
+
+
+.avaliacao-card h1 {
+
+    color: #ffd900;
+
+    margin-bottom: 10px;
+
+}
+
+
+.avaliacao-subtitulo {
+
+    color: #ddd;
+
+    margin-bottom: 30px;
+
+}
+
+
+.aula-avaliacao {
+
+    border: 1px solid #ffd900;
+
+    border-radius: 12px;
+
+    padding: 15px;
+
+    margin-bottom: 25px;
+
+}
+
+
+.aula-avaliacao h2 {
+
+    color: white;
+
+    margin: 5px;
+
+}
+
+
+.aula-avaliacao p {
+
+    color: #ffd900;
+
+    margin: 5px;
+
+}
+
+
+.avaliacao-card h3 {
+
+    color: white;
+
+    margin-top: 20px;
+
+}
+
+
+/* ESTRELAS */
+
+.estrelas {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    margin: 15px 0;
+
+}
+
+
+.estrelas button {
+
+    background: none;
+
+    border: none;
+
+    font-size: 42px;
+
+    color: #555;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+.estrelas button:hover {
+
+    transform: scale(1.15);
+
+    color: #ffd900;
+
+}
+
+
+.estrelas
+.estrela-selecionada {
+
+    color: #ffd900;
+
+}
+
+
+#textoNota {
+
+    color: #ffd900;
+
+    min-height: 25px;
+
+    font-weight: bold;
+
+}
+
+
+/* COMENTÁRIO */
+
+.avaliacao-card label {
+
+    display: block;
+
+    text-align: left;
+
+    color: white;
+
+    margin-top: 20px;
+
+    margin-bottom: 8px;
+
+}
+
+
+.avaliacao-card textarea {
+
+    width: 100%;
+
+    min-height: 120px;
+
+    resize: vertical;
+
+    box-sizing: border-box;
+
+    padding: 12px;
+
+    border-radius: 10px;
+
+    border: 1px solid #555;
+
+    background: #111;
+
+    color: white;
+
+    font-family: Arial, sans-serif;
+
+}
+
+
+.avaliacao-card textarea:focus {
+
+    outline: none;
+
+    border-color: #ffd900;
+
+}
+
+
+.btn-enviar-avaliacao {
+
+    width: 100%;
+
+    margin-top: 20px;
+
+}
+
+
+#mensagemAvaliacao {
+
+    color: #00ff66;
+
+    font-weight: bold;
+
+    margin-top: 15px;
+
+}
+
+/* ==========================================================
+   🎯 QUIZ - DESCUBRA SEU TREINO IDEAL
+   ========================================================== */
+
+.quiz-body {
+    min-height: 100vh;
+}
+
+
+/* CONTAINER */
+
+.quiz-container {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    min-height: calc(100vh - 80px);
+
+    padding: 30px;
+
+}
+
+
+/* CARD */
+
+.quiz-card {
+
+    width: 600px;
+
+    max-width: 95%;
+
+    background: rgba(0, 0, 0, 0.88);
+
+    border: 2px solid #ffd900;
+
+    border-radius: 20px;
+
+    padding: 35px;
+
+    text-align: center;
+
+    box-shadow:
+        0 0 20px rgba(255, 217, 0, 0.25);
+
+}
+
+
+/* TÍTULO */
+
+.quiz-card h1 {
+
+    color: #ffd900;
+
+    margin-bottom: 10px;
+
+}
+
+
+.quiz-subtitulo {
+
+    color: white;
+
+    margin-bottom: 25px;
+
+}
+
+
+/* PROGRESSO */
+
+.quiz-progresso {
+
+    margin-bottom: 30px;
+
+}
+
+
+#numeroPergunta {
+
+    color: #ffd900;
+
+    font-weight: bold;
+
+}
+
+
+.barra-quiz {
+
+    width: 100%;
+
+    height: 10px;
+
+    background: #333;
+
+    border-radius: 10px;
+
+    margin-top: 10px;
+
+    overflow: hidden;
+
+}
+
+
+.barra-quiz-progresso {
+
+    height: 100%;
+
+    width: 33%;
+
+    background: #ffd900;
+
+    border-radius: 10px;
+
+    transition: width 0.3s ease;
+
+}
+
+
+/* PERGUNTAS */
+
+.quiz-pergunta {
+
+    display: none;
+
+}
+
+
+.quiz-pergunta.ativa {
+
+    display: block;
+
+}
+
+
+.quiz-pergunta h2 {
+
+    color: white;
+
+    margin-bottom: 25px;
+
+}
+
+
+/* OPÇÕES */
+
+.opcoes-quiz {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+
+}
+
+
+.opcoes-quiz button {
+
+    width: 100%;
+
+    padding: 15px;
+
+    background: #111;
+
+    border: 1px solid #ffd900;
+
+    border-radius: 10px;
+
+    color: white;
+
+    font-size: 16px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+.opcoes-quiz button:hover {
+
+    background: #2b2b2b;
+
+    transform: scale(1.02);
+
+}
+
+
+.opcoes-quiz button.opcao-selecionada {
+
+    background: #ffd900;
+
+    color: black;
+
+    font-weight: bold;
+
+}
+
+
+/* BOTÕES */
+
+.quiz-botoes {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-top: 30px;
+
+    gap: 15px;
+
+}
+
+
+.quiz-botoes .btn-amarelo {
+
+    min-width: 120px;
+
+}
+
+
+/* RESULTADO */
+
+.resultado-quiz {
+
+    display: none;
+
+    margin-top: 20px;
+
+    padding: 25px;
+
+    border: 1px solid #ffd900;
+
+    border-radius: 15px;
+
+    background: rgba(255, 217, 0, 0.05);
+
+}
+
+
+.resultado-quiz h2 {
+
+    color: white;
+
+}
+
+
+.resultado-quiz h1 {
+
+    color: #ffd900;
+
+    font-size: 32px;
+
+    margin: 20px 0;
+
+}
+
+
+.resultado-quiz p {
+
+    color: white;
+
+    line-height: 1.6;
+
+    margin-bottom: 25px;
+
+}
+
+/* =====================================================
+   🎯 QUIZ - TREINO IDEAL
+   ===================================================== */
+
+.quiz-container {
+    width: 100%;
+    min-height: calc(100vh - 70px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 80px;
+    box-sizing: border-box;
+}
+
+.quiz-card {
+    width: 600px;
+    max-width: 90%;
+    background: rgba(0, 0, 0, 0.88);
+    border: 2px solid #ffd900;
+    border-radius: 22px;
+    padding: 35px 40px;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(255, 217, 0, 0.25);
+}
+
+/* Título */
+
+.quiz-card h1 {
+    color: #ffd900;
+    font-size: 30px;
+    margin-bottom: 10px;
+}
+
+.quiz-subtitulo {
+    color: white;
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+/* Número da pergunta */
+
+.quiz-progresso {
+    margin: 20px auto 30px;
+    color: #ffd900;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+/* Perguntas */
+
+.quiz-pergunta {
+    width: 100%;
+}
+
+.quiz-pergunta h2 {
+    color: white;
+    font-size: 21px;
+    margin-bottom: 25px;
+}
+
+/* Botões das respostas */
+
+.opcao-quiz {
+    display: block;
+    width: 100%;
+    margin: 12px 0;
+    padding: 15px 18px;
+
+    background: rgba(20, 20, 20, 0.95);
+    color: white;
+
+    border: 1px solid #ffd900;
+    border-radius: 12px;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.25s;
+}
+
+/* Quando passar o mouse */
+
+.opcao-quiz:hover {
+    background: #ffd900;
+    color: black;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 217, 0, 0.25);
+}
+
+/* Quando clicar */
+
+.opcao-quiz:active {
+    transform: scale(0.98);
+}
+
+/* =====================================================
+   🏆 RESULTADO
+   ===================================================== */
+
+#resultadoQuiz {
+    text-align: center;
+    padding: 20px 10px;
+}
+
+#resultadoQuiz h2 {
+    color: white;
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+#modalidadeResultado {
+    color: #ffd900;
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+#recomendacaoResultado {
+    color: white;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+/* =====================================================
+   📱 RESPONSIVO
+   ===================================================== */
+
+@media (max-width: 700px) {
+
+    .quiz-container {
+        padding-top: 40px;
+    }
+
+    .quiz-card {
+        padding: 25px 20px;
+    }
+
+    .quiz-card h1 {
+        font-size: 25px;
+    }
+
+    .quiz-pergunta h2 {
+        font-size: 18px;
+    }
+
+    .opcao-quiz {
+        font-size: 14px;
+        padding: 13px;
+    }
+}

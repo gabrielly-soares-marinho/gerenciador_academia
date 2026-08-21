@@ -604,6 +604,728 @@ def historico_treinos(usuario_id):
 
     return jsonify(resultado)
 
+# ==========================================================
+# ⭐ AVALIAR AULA
+# ==========================================================
+
+@app.route("/avaliar-aula", methods=["POST"])
+def avaliar_aula():
+
+    try:
+
+        data = request.get_json()
+
+        usuario_id = data.get("usuario_id")
+        aula_id = data.get("aula_id")
+        nota = data.get("nota")
+        comentario = data.get("comentario")
+
+        # Verifica dados obrigatórios
+        if not usuario_id or not aula_id or not nota:
+
+            return jsonify({
+                "erro": "Preencha todos os campos obrigatórios"
+            }), 400
+
+        # Verifica se a nota é válida
+        if int(nota) < 1 or int(nota) > 5:
+
+            return jsonify({
+                "erro": "A nota deve estar entre 1 e 5"
+            }), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Verifica se o usuário realmente agendou essa aula
+        cursor.execute("""
+            SELECT id
+            FROM agendamentos
+            WHERE usuario_id = %s
+            AND aula_id = %s
+        """, (
+            usuario_id,
+            aula_id
+        ))
+
+        agendamento = cursor.fetchone()
+
+        if not agendamento:
+
+            cursor.close()
+            conn.close()
+
+            return jsonify({
+                "erro": "Você precisa ter agendado esta aula para avaliá-la."
+            }), 403
+
+        # Verifica se já avaliou
+        cursor.execute("""
+            SELECT id
+            FROM avaliacoes_aulas
+            WHERE usuario_id = %s
+            AND aula_id = %s
+        """, (
+            usuario_id,
+            aula_id
+        ))
+
+        avaliacao_existente = cursor.fetchone()
+
+        if avaliacao_existente:
+
+            cursor.close()
+            conn.close()
+
+            return jsonify({
+                "erro": "Você já avaliou esta aula."
+            }), 409
+
+        # Salva avaliação
+        cursor.execute("""
+            INSERT INTO avaliacoes_aulas
+            (
+                usuario_id,
+                aula_id,
+                nota,
+                comentario,
+                data_avaliacao
+            )
+            VALUES
+            (
+                %s,
+                %s,
+                %s,
+                %s,
+                NOW()
+            )
+        """, (
+            usuario_id,
+            aula_id,
+            nota,
+            comentario
+        ))
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "mensagem": "Avaliação enviada com sucesso!"
+        }), 201
+
+    except Exception as e:
+
+        print("ERRO AO AVALIAR AULA:", e)
+
+        return jsonify({
+            "erro": "Erro ao salvar avaliação"
+        }), 500
+
+
+# ==========================================================
+# ⭐ LISTAR AVALIAÇÕES DO USUÁRIO
+# ==========================================================
+
+@app.route("/minhas-avaliacoes/<int:usuario_id>", methods=["GET"])
+def minhas_avaliacoes(usuario_id):
+
+    try:
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT
+                av.id,
+                av.nota,
+                av.comentario,
+                av.data_avaliacao,
+                a.nome,
+                a.horario
+
+            FROM avaliacoes_aulas av
+
+            JOIN aulas a
+            ON av.aula_id = a.id
+
+            WHERE av.usuario_id = %s
+
+            ORDER BY av.data_avaliacao DESC
+        """, (
+            usuario_id,
+        ))
+
+        avaliacoes = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        resultado = []
+
+        for a in avaliacoes:
+
+            resultado.append({
+
+                "id": a[0],
+
+                "nota": a[1],
+
+                "comentario": a[2],
+
+                "data": str(a[3]),
+
+                "aula": a[4],
+
+                "horario": a[5]
+            })
+
+        return jsonify(resultado)
+
+    except Exception as e:
+
+        print("ERRO AO BUSCAR AVALIAÇÕES:", e)
+
+        return jsonify({
+            "erro": "Erro ao buscar avaliações"
+        }), 500
+
+# ==========================================================
+# CALCULADORA IMC / TMB
+# ==========================================================
+
+@app.route("/calcular-imc", methods=["POST"])
+def calcular_imc():
+
+    try:
+
+        dados = request.get_json()
+
+        usuario_id = dados.get("usuario_id")
+        peso = float(dados.get("peso"))
+        altura = float(dados.get("altura"))
+        idade = int(dados.get("idade"))
+        genero = dados.get("genero")
+
+        # ==========================
+        # VALIDAÇÕES
+        # ==========================
+
+        if not usuario_id:
+            return jsonify({
+                "erro": "Usuário não informado"
+            }), 400
+
+        if peso <= 0:
+            return jsonify({
+                "erro": "Peso inválido"
+            }), 400
+
+        if altura <= 0:
+            return jsonify({
+                "erro": "Altura inválida"
+            }), 400
+
+        if idade <= 0:
+            return jsonify({
+                "erro": "Idade inválida"
+            }), 400
+
+        if genero not in ["masculino", "feminino"]:
+            return jsonify({
+                "erro": "Gênero inválido"
+            }), 400
+
+        # ==========================
+        # IMC
+        # ==========================
+
+        altura_metros = altura / 100
+
+        imc = peso / (altura_metros ** 2)
+
+        imc = round(imc, 2)
+
+        # ==========================
+        # CLASSIFICAÇÃO
+        # ==========================
+
+        if imc < 18.5:
+
+            classificacao = "Abaixo do peso"
+
+            recomendacao = (
+                "Treinos de musculação com foco em ganho de massa "
+                "e fortalecimento muscular."
+            )
+
+        elif imc < 25:
+
+            classificacao = "Peso ideal"
+
+            recomendacao = (
+                "Treinos de musculação combinados com exercícios "
+                "cardiorrespiratórios para manutenção e condicionamento."
+            )
+
+        elif imc < 30:
+
+            classificacao = "Sobrepeso"
+
+            recomendacao = (
+                "Treinos de musculação combinados com exercícios "
+                "cardiorrespiratórios de intensidade moderada."
+            )
+
+        else:
+
+            classificacao = "Obesidade"
+
+            recomendacao = (
+                "Treinos de baixo impacto, caminhada e musculação "
+                "progressiva, respeitando os limites individuais."
+            )
+
+        # ==========================
+        # TMB
+        # Fórmula de Mifflin-St Jeor
+        # ==========================
+
+        if genero == "masculino":
+
+            tmb = (
+                (10 * peso)
+                + (6.25 * altura)
+                - (5 * idade)
+                + 5
+            )
+
+        else:
+
+            tmb = (
+                (10 * peso)
+                + (6.25 * altura)
+                - (5 * idade)
+                - 161
+            )
+
+        tmb = round(tmb, 2)
+
+        # ==========================
+        # SALVAR NO BANCO
+        # ==========================
+
+        conn = mysql.connector.connect(
+            host="db",
+            user="root",
+            password="root",
+            database="academia"
+        )
+
+        cursor = conn.cursor()
+
+        sql = """
+            INSERT INTO avaliacao_fisica
+            (
+                usuario_id,
+                peso,
+                altura,
+                idade,
+                genero,
+                imc,
+                classificacao,
+                tmb,
+                recomendacao
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        valores = (
+            usuario_id,
+            peso,
+            altura,
+            idade,
+            genero,
+            imc,
+            classificacao,
+            tmb,
+            recomendacao
+        )
+
+        cursor.execute(sql, valores)
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+
+            "mensagem": "Avaliação calculada e salva com sucesso",
+
+            "imc": imc,
+
+            "classificacao": classificacao,
+
+            "tmb": tmb,
+
+            "recomendacao": recomendacao
+
+        }), 200
+
+    except Exception as e:
+
+        print("ERRO CALCULADORA:", e)
+
+        return jsonify({
+            "erro": "Erro ao calcular avaliação física"
+        }), 500
+
+
+# ==========================================================
+# BUSCAR ÚLTIMA AVALIAÇÃO FÍSICA
+# ==========================================================
+
+@app.route("/avaliacao-fisica/<int:usuario_id>", methods=["GET"])
+def buscar_avaliacao_fisica(usuario_id):
+
+    try:
+
+        conn = mysql.connector.connect(
+            host="db",
+            user="root",
+            password="root",
+            database="academia"
+        )
+
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT
+                id,
+                peso,
+                altura,
+                idade,
+                genero,
+                imc,
+                classificacao,
+                tmb,
+                recomendacao,
+                data_calculo
+            FROM avaliacao_fisica
+            WHERE usuario_id = %s
+            ORDER BY id DESC
+            LIMIT 1
+        """, (usuario_id,))
+
+        avaliacao = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if not avaliacao:
+
+            return jsonify({
+                "mensagem": "Nenhuma avaliação encontrada"
+            }), 404
+
+        return jsonify(avaliacao), 200
+
+    except Exception as e:
+
+        print("ERRO AO BUSCAR AVALIAÇÃO:", e)
+
+        return jsonify({
+            "erro": "Erro ao buscar avaliação física"
+        }), 500
+
+# ==========================================================
+# 🎯 QUIZ - DESCUBRA SEU TREINO IDEAL
+# ==========================================================
+
+@app.route("/quiz-treino", methods=["POST"])
+def salvar_quiz_treino():
+
+    try:
+
+        data = request.get_json()
+
+        usuario_id = data.get("usuario_id")
+        objetivo = data.get("objetivo")
+        preferencia = data.get("preferencia")
+        experiencia = data.get("experiencia")
+
+        # ==================================================
+        # VALIDAR DADOS
+        # ==================================================
+
+        if not usuario_id:
+            return jsonify({
+                "erro": "Usuário não identificado."
+            }), 400
+
+        if not objetivo or not preferencia or not experiencia:
+            return jsonify({
+                "erro": "Responda todas as perguntas."
+            }), 400
+
+        # ==================================================
+        # DEFINIR MODALIDADE
+        # ==================================================
+
+        modalidade = ""
+        recomendacao = ""
+
+        # --------------------------------------------------
+        # OBJETIVO: GANHAR MASSA
+        # --------------------------------------------------
+
+        if objetivo == "massa":
+
+            modalidade = "Musculação"
+
+            if experiencia == "iniciante":
+
+                recomendacao = (
+                    "Treinos de musculação para iniciantes, "
+                    "com foco em adaptação, técnica e ganho "
+                    "gradual de massa muscular."
+                )
+
+            elif experiencia == "intermediario":
+
+                recomendacao = (
+                    "Treinos de musculação com foco em "
+                    "hipertrofia e progressão de cargas."
+                )
+
+            else:
+
+                recomendacao = (
+                    "Treinos avançados de musculação com foco "
+                    "em hipertrofia, força e progressão de cargas."
+                )
+
+        # --------------------------------------------------
+        # OBJETIVO: EMAGRECER
+        # --------------------------------------------------
+
+        elif objetivo == "emagrecer":
+
+            if preferencia == "dinamico":
+
+                modalidade = "HIIT"
+
+                recomendacao = (
+                    "Treinos rápidos e intensos para aumentar "
+                    "o gasto calórico e melhorar o condicionamento."
+                )
+
+            else:
+
+                modalidade = "Funcional"
+
+                recomendacao = (
+                    "Treinos funcionais que combinam força, "
+                    "resistência e gasto calórico."
+                )
+
+        # --------------------------------------------------
+        # OBJETIVO: CONDICIONAMENTO
+        # --------------------------------------------------
+
+        elif objetivo == "condicionamento":
+
+            if preferencia == "dinamico":
+
+                modalidade = "Funcional"
+
+                recomendacao = (
+                    "Treinos funcionais dinâmicos para melhorar "
+                    "resistência, força, agilidade e condicionamento."
+                )
+
+            else:
+
+                modalidade = "Cardio"
+
+                recomendacao = (
+                    "Treinos cardiovasculares para melhorar "
+                    "resistência e condicionamento físico."
+                )
+
+        # --------------------------------------------------
+        # OBJETIVO: RELAXAMENTO / MOBILIDADE
+        # --------------------------------------------------
+
+        elif objetivo == "relaxamento":
+
+            modalidade = "Yoga / Pilates"
+
+            recomendacao = (
+                "Treinos focados em mobilidade, flexibilidade, "
+                "equilíbrio e bem-estar."
+            )
+
+        # --------------------------------------------------
+        # CASO NÃO IDENTIFICADO
+        # --------------------------------------------------
+
+        else:
+
+            modalidade = "Funcional"
+
+            recomendacao = (
+                "Treino funcional completo para desenvolver "
+                "força, resistência e condicionamento."
+            )
+
+        # ==================================================
+        # CONECTAR AO BANCO
+        # ==================================================
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # ==================================================
+        # SALVAR RESULTADO
+        # ==================================================
+
+        cursor.execute("""
+            INSERT INTO quiz_treino
+            (
+                usuario_id,
+                objetivo,
+                preferencia,
+                experiencia,
+                modalidade_recomendada,
+                recomendacao,
+                data_quiz
+            )
+            VALUES
+            (
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                NOW()
+            )
+        """, (
+            usuario_id,
+            objetivo,
+            preferencia,
+            experiencia,
+            modalidade,
+            recomendacao
+        ))
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        # ==================================================
+        # RETORNAR RESULTADO
+        # ==================================================
+
+        return jsonify({
+
+            "mensagem": "Quiz realizado com sucesso!",
+
+            "resultado": {
+
+                "modalidade": modalidade,
+
+                "recomendacao": recomendacao
+
+            }
+
+        }), 201
+
+    except Exception as e:
+
+        print("ERRO AO SALVAR QUIZ:", e)
+
+        return jsonify({
+            "erro": "Erro ao salvar o resultado do quiz."
+        }), 500
+
+
+# ==========================================================
+# 🎯 BUSCAR ÚLTIMO RESULTADO DO QUIZ
+# ==========================================================
+
+@app.route("/quiz-treino/<int:usuario_id>", methods=["GET"])
+def buscar_ultimo_quiz(usuario_id):
+
+    try:
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT
+                id,
+                objetivo,
+                preferencia,
+                experiencia,
+                modalidade_recomendada,
+                recomendacao,
+                data_quiz
+            FROM quiz_treino
+            WHERE usuario_id = %s
+            ORDER BY data_quiz DESC
+            LIMIT 1
+        """, (usuario_id,))
+
+        resultado = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        # ==================================================
+        # NENHUM RESULTADO
+        # ==================================================
+
+        if not resultado:
+
+            return jsonify({
+                "mensagem": "Nenhum quiz realizado."
+            }), 404
+
+        # ==================================================
+        # RETORNAR RESULTADO
+        # ==================================================
+
+        return jsonify({
+
+            "id": resultado[0],
+
+            "objetivo": resultado[1],
+
+            "preferencia": resultado[2],
+
+            "experiencia": resultado[3],
+
+            "modalidade_recomendada": resultado[4],
+
+            "recomendacao": resultado[5],
+
+            "data_quiz": str(resultado[6])
+
+        }), 200
+
+    except Exception as e:
+
+        print("ERRO AO BUSCAR QUIZ:", e)
+
+        return jsonify({
+            "erro": "Erro ao buscar resultado do quiz."
+        }), 500
+
 # ▶️ SEMPRE POR ÚLTIMO
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Quiz - Treino Ideal</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+
+<body>
+
+<div class="dashboard">
+
+
+    <!-- TOPO -->
+
+    <header class="topbar">
+
+        <h2>🎯 DESCUBRA SEU TREINO IDEAL</h2>
+
+        <div class="user-info">
+
+            <button
+                class="btn-amarelo"
+                onclick="voltarDashboard()">
+
+                Voltar
+
+            </button>
+
+
+            <button
+                class="btn-amarelo"
+                onclick="logout()">
+
+                Sair
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- QUIZ -->
+
+    <main class="quiz-container">
+
+        <div class="quiz-card">
+
+
+            <h1>
+                🎯 Descubra seu Treino Ideal
+            </h1>
+
+
+            <p class="quiz-subtitulo">
+
+                Responda 3 perguntas e descubra
+                qual modalidade combina com você!
+
+            </p>
+
+
+
+            <!-- PROGRESSO -->
+
+            <div class="quiz-progresso">
+
+                <span id="numeroPergunta">
+
+                    Pergunta 1 de 3
+
+                </span>
+
+            </div>
+
+
+
+            <!-- ================================= -->
+            <!-- PERGUNTA 1 -->
+            <!-- ================================= -->
+
+            <div
+                id="pergunta1"
+                class="quiz-pergunta"
+                style="display: block;">
+
+                <h2>
+
+                    1️⃣ Qual é o seu principal objetivo?
+
+                </h2>
+
+
+                <button
+                    type="button"
+                    class="opcao-quiz"
+                    onclick="responder('objetivo', 'musculacao')">
+
+                    💪 Ganhar massa muscular
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="opcao-quiz"
+                    onclick="responder('objetivo', 'emagrecimento')">
+
+                    🔥 Emagrecer
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="opcao-quiz"
+                    onclick="responder('objetivo', 'condicionamento')">
+
+                    🏃 Melhorar o condicionamento
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="opcao-quiz"
+                    onclick="responder('objetivo', 'flexibilidade')">
+
+                    🧘 Melhorar flexibilidade e mobilidade
+
+                </button>
+
+            </div>
+
+
+
+            <!-- ================================= -->
+            <!-- PERGUNTA 2 -->
+            <!-- ================================= -->
+
+            <div
+                id="pergunta2"
+                class="quiz-pergunta"
+                style="display: none;">
+
+                <h2>
+
+                    2️⃣ Como você prefere treinar?
+
+                </h2>
+
+
+                <button
+                    type="button"
+                    class="opcao-quiz"
+                    onclick="responder('preferencia', 'academia')">
+
+                    🏋️ Academia e musculação
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="opcao-quiz"
+                    onclick="responder('preferencia', 'cardio')">
+
+                    🏃 Corrida e exercícios cardiovasculares
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="opcao-quiz"
+                    onclick="responder('preferencia', 'aulas')">
+
+                    🕺 Aulas coletivas e dinâmicas
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="opcao-quiz"
+                    onclick="responder('preferencia', 'tranquilo')">
+
+                    🧘 Exercícios mais tranquilos
+
+                </button>
+
+            </div>
+
+
+
+            <!-- ================================= -->
+            <!-- PERGUNTA 3 -->
+            <!-- ================================= -->
+
+            <div
+                id="pergunta3"
+                class="quiz-pergunta"
+                style="display: none;">
+
+                <h2>
+
+                    3️⃣ Qual experiência você possui?
+
+                </h2>
+
+
+                <button
+                    type="button"
+                    class="opcao-quiz"
+                    onclick="responder('experiencia', 'iniciante')">
+
+                    🌱 Sou iniciante
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="opcao-quiz"
+                    onclick="responder('experiencia', 'intermediario')">
+
+                    ⚡ Tenho alguma experiência
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="opcao-quiz"
+                    onclick="responder('experiencia', 'avancado')">
+
+                    🔥 Já treino há bastante tempo
+
+                </button>
+
+            </div>
+
+
+
+            <!-- ================================= -->
+            <!-- RESULTADO -->
+            <!-- ================================= -->
+
+            <div
+                id="resultadoQuiz"
+                style="display: none;">
+
+                <h2>
+
+                    🏆 Seu treino ideal é:
+
+                </h2>
+
+
+                <h1 id="modalidadeResultado">
+
+                    --
+
+                </h1>
+
+
+                <p id="recomendacaoResultado">
+
+                    --
+
+                </p>
+
+
+                <button
+                    type="button"
+                    class="btn-amarelo"
+                    onclick="voltarDashboard()">
+
+                    Voltar para Dashboard
+
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </main>
+
+</div>
+
+
+
+<!-- PRIMEIRO O SCRIPT DO QUIZ -->
+
+<script src="js/quiz-treino.js"></script>
+
+
+<!-- DEPOIS O SCRIPT PRINCIPAL -->
+
+<script src="js/script.js"></script>
+
+
+</body>
+
+</html>

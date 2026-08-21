@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
   <meta charset="UTF-8">
   <title>Agendamentos</title>
@@ -9,27 +10,52 @@
 <body class="dashboard">
 
 <header class="topbar">
+
   <h2>AGENDAMENTOS</h2>
-  <button class="btn-amarelo" onclick="window.location.href='dashboard.html'">
+
+  <button
+    class="btn-amarelo"
+    onclick="window.location.href='dashboard.html'">
     Voltar
   </button>
+
 </header>
+
 
 <div class="container-agenda">
 
-  <div class="bloco">
-    <h2>Aulas Disponíveis</h2>
-    <div id="aulas" class="cards-agenda"></div>
-  </div>
+  <!-- AULAS DISPONÍVEIS -->
 
   <div class="bloco">
+
+    <h2>Aulas Disponíveis</h2>
+
+    <div
+      id="aulas"
+      class="cards-agenda">
+    </div>
+
+  </div>
+
+
+  <!-- MEUS AGENDAMENTOS -->
+
+  <div class="bloco">
+
     <h2>Meus Agendamentos</h2>
-    <div id="meus" class="cards-agenda"></div>
+
+    <div
+      id="meus"
+      class="cards-agenda">
+    </div>
+
   </div>
 
 </div>
 
+
 <script src="js/agendamentos.js"></script>
 
 </body>
+
 </html>

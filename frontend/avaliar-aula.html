@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Avaliar Aula - Olympus</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body onload="carregarAulaParaAvaliar()">
+
+<div class="dashboard">
+
+    <!-- TOPO -->
+
+    <header class="topbar">
+
+        <h2>⭐ AVALIE SUA AULA</h2>
+
+        <div class="user-info">
+
+            <button
+                class="btn-amarelo"
+                onclick="window.location.href='agendamentos.html'">
+
+                Voltar
+
+            </button>
+
+            <button
+                class="btn-amarelo"
+                onclick="logout()">
+
+                Sair
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- CONTAINER -->
+
+    <main class="avaliacao-container">
+
+        <div class="avaliacao-card">
+
+            <h1>⭐ Avalie sua aula</h1>
+
+            <p class="avaliacao-subtitulo">
+
+                Sua opinião ajuda a melhorar a experiência
+                dos alunos do Olympus Gym.
+
+            </p>
+
+
+            <!-- AULA -->
+
+            <div class="aula-avaliacao">
+
+                <h2 id="nomeAula">
+
+                    Carregando aula...
+
+                </h2>
+
+                <p id="horarioAula">
+
+                    --
+
+                </p>
+
+            </div>
+
+
+            <!-- NOTA -->
+
+            <h3>
+
+                Como você avalia esta aula?
+
+            </h3>
+
+
+            <div class="estrelas">
+
+                <button
+                    type="button"
+                    onclick="selecionarNota(1)">
+
+                    ★
+
+                </button>
+
+                <button
+                    type="button"
+                    onclick="selecionarNota(2)">
+
+                    ★
+
+                </button>
+
+                <button
+                    type="button"
+                    onclick="selecionarNota(3)">
+
+                    ★
+
+                </button>
+
+                <button
+                    type="button"
+                    onclick="selecionarNota(4)">
+
+                    ★
+
+                </button>
+
+                <button
+                    type="button"
+                    onclick="selecionarNota(5)">
+
+                    ★
+
+                </button>
+
+            </div>
+
+
+            <p id="textoNota">
+
+                Selecione uma nota
+
+            </p>
+
+
+            <!-- COMENTÁRIO -->
+
+            <label for="comentario">
+
+                Comentário
+
+            </label>
+
+            <textarea
+                id="comentario"
+                maxlength="500"
+                placeholder="Conte como foi sua experiência na aula...">
+            </textarea>
+
+
+            <!-- BOTÃO -->
+
+            <button
+                class="btn-amarelo btn-enviar-avaliacao"
+                onclick="enviarAvaliacao()">
+
+                ⭐ Enviar Avaliação
+
+            </button>
+
+
+            <p id="mensagemAvaliacao"></p>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<script src="js/avaliar-aula.js"></script>
+
+<script src="js/script.js"></script>
+
+</body>
+
+</html>
