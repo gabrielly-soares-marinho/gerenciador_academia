@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Minha Sequência - Olympus</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .streak-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 75vh;
+            padding: 30px;
+        }
+
+        .streak-card {
+            width: 600px;
+            max-width: 90%;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #ffd700;
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.25);
+        }
+
+        .streak-card h1 {
+            color: #ffd700;
+            margin-bottom: 30px;
+        }
+
+        .streak-numero {
+            font-size: 70px;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 20px 0;
+        }
+
+        .streak-label {
+            font-size: 22px;
+            color: white;
+            margin-bottom: 25px;
+        }
+
+        .streak-mensagem {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .streak-info {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .streak-box {
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid #ffd700;
+            border-radius: 12px;
+            padding: 20px;
+            min-width: 180px;
+        }
+
+        .streak-box h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .streak-box p {
+            color: white;
+            margin: 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard">
+
+        <header class="topbar">
+
+            <h2>🔥 MINHA SEQUÊNCIA</h2>
+
+            <div class="user-info">
+
+                <button
+                    class="btn-amarelo"
+                    onclick="window.location.href='dashboard.html'">
+                    Voltar
+                </button>
+
+                <button
+                    class="btn-amarelo"
+                    onclick="logout()">
+                    Sair
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <main class="streak-container">
+
+            <div class="streak-card">
+
+                <h1>🔥 Minha Sequência</h1>
+
+                <div
+                    id="streakNumero"
+                    class="streak-numero">
+                    0
+                </div>
+
+                <div class="streak-label">
+                    dias consecutivos
+                </div>
+
+                <p
+                    id="streakMensagem"
+                    class="streak-mensagem">
+                    Carregando sua sequência...
+                </p>
+
+
+                <div class="streak-info">
+
+                    <div class="streak-box">
+
+                        <h3>🔥 Sequência atual</h3>
+
+                        <p id="streakAtual">
+                            0 dias
+                        </p>
+
+                    </div>
+
+
+                    <div class="streak-box">
+
+                        <h3>💪 Status</h3>
+
+                        <p id="streakStatus">
+                            Continue treinando!
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <script src="js/streak.js"></script>
+    <script src="js/script.js"></script>
+
+</body>
+
+</html>

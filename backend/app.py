@@ -484,17 +484,21 @@ def buscar_progresso(usuario_id):
 # 💪 CONCLUIR TREINO
 @app.route("/concluir-treino", methods=["POST"])
 def concluir_treino():
-
     try:
-
-        data = request.get_json()
+        data = request.get_json() or {}
 
         usuario_id = data.get("usuario_id")
         treino = data.get("treino")
 
+        if not usuario_id or not treino:
+            return jsonify({
+                "erro": "Usuário e treino são obrigatórios"
+            }), 400
+
         conn = get_db_connection()
         cursor = conn.cursor()
 
+        # Salva o treino real no histórico.
         cursor.execute("""
             INSERT INTO treinos_concluidos
             (usuario_id, treino_nome)
@@ -504,6 +508,7 @@ def concluir_treino():
             treino
         ))
 
+        # Atualiza o progresso geral do usuário.
         cursor.execute("""
             SELECT id, treinos_concluidos
             FROM progresso
@@ -513,12 +518,9 @@ def concluir_treino():
         progresso = cursor.fetchone()
 
         if progresso:
-
             novo_total = progresso[1] + 1
 
-            percentual = int(
-                (novo_total / 20) * 100
-            )
+            percentual = int((novo_total / 20) * 100)
 
             if percentual > 100:
                 percentual = 100
@@ -535,7 +537,6 @@ def concluir_treino():
             ))
 
         else:
-
             cursor.execute("""
                 INSERT INTO progresso
                 (
@@ -555,24 +556,30 @@ def concluir_treino():
                 )
             """, (usuario_id,))
 
+        # IMPORTANTE: os desafios são atualizados automaticamente
+        # a partir dos treinos realmente registrados no banco.
+        desafios_atualizados = atualizar_desafios_automaticamente(
+            cursor,
+            usuario_id
+        )
+
         conn.commit()
 
         cursor.close()
         conn.close()
 
         return jsonify({
-            "mensagem":
-            "Treino salvo com sucesso!"
-        })
+            "mensagem": "Treino salvo com sucesso!",
+            "desafios_atualizados": desafios_atualizados
+        }), 200
 
     except Exception as e:
-
-        print("ERRO:", e)
+        print("ERRO AO CONCLUIR TREINO:", e)
 
         return jsonify({
-            "erro":
-            "Erro ao salvar treino"
+            "erro": "Erro ao salvar treino"
         }), 500
+
 
 # HISTORICO DE TREINOS
 @app.route("/historico-treinos/<int:usuario_id>", methods=["GET"])
@@ -1324,6 +1331,523 @@ def buscar_ultimo_quiz(usuario_id):
 
         return jsonify({
             "erro": "Erro ao buscar resultado do quiz."
+        }), 500
+
+# ==========================================================
+# 🔥 SEQUÊNCIA DE TREINOS - STREAK
+# ==========================================================
+
+@app.route("/streak/<int:usuario_id>", methods=["GET"])
+def buscar_streak(usuario_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT DISTINCT DATE(data_conclusao)
+            FROM treinos_concluidos
+            WHERE usuario_id = %s
+            ORDER BY DATE(data_conclusao) DESC
+        """, (usuario_id,))
+
+        dias = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        if not dias:
+            return jsonify({
+                "streak": 0,
+                "mensagem": "Você ainda não possui uma sequência."
+            }), 200
+
+        datas = [d[0] for d in dias]
+
+        from datetime import date, timedelta
+
+        hoje = date.today()
+
+        # Verifica se treinou hoje
+        if datas[0] == hoje:
+            dia_atual = datas[0]
+
+        # Se não treinou hoje, permite considerar ontem
+        elif datas[0] == hoje - timedelta(days=1):
+            dia_atual = datas[0]
+
+        else:
+            return jsonify({
+                "streak": 0,
+                "mensagem": "Sua sequência foi encerrada. Comece uma nova!"
+            }), 200
+
+        streak = 1
+
+        for i in range(1, len(datas)):
+            esperado = dia_atual - timedelta(days=i)
+
+            if datas[i] == esperado:
+                streak += 1
+            else:
+                break
+
+        return jsonify({
+            "streak": streak,
+            "mensagem": f"🔥 Você está há {streak} dia(s) treinando!"
+        }), 200
+
+    except Exception as e:
+        print("ERRO AO BUSCAR STREAK:", e)
+
+        return jsonify({
+            "erro": "Erro ao calcular sequência de treinos"
+        }), 500
+
+# ==========================================================
+# 🏆 SISTEMA DE DESAFIOS
+# ==========================================================
+
+from datetime import date, timedelta
+
+
+def calcular_streak_desafio(cursor, usuario_id, data_inicio):
+    """
+    Calcula a sequência atual de dias consecutivos do usuário,
+    considerando somente os treinos feitos depois que ele entrou
+    no desafio.
+    """
+
+    cursor.execute("""
+        SELECT DISTINCT DATE(data_conclusao)
+        FROM treinos_concluidos
+        WHERE usuario_id = %s
+        AND data_conclusao >= %s
+        ORDER BY DATE(data_conclusao) DESC
+    """, (usuario_id, data_inicio))
+
+    registros = cursor.fetchall()
+
+    if not registros:
+        return 0
+
+    datas = [registro[0] for registro in registros]
+    hoje = date.today()
+
+    # A sequência pode estar ativa hoje ou ter sido mantida até ontem.
+    if datas[0] == hoje:
+        dia_atual = datas[0]
+    elif datas[0] == hoje - timedelta(days=1):
+        dia_atual = datas[0]
+    else:
+        return 0
+
+    streak = 1
+
+    for i in range(1, len(datas)):
+        esperado = dia_atual - timedelta(days=i)
+
+        if datas[i] == esperado:
+            streak += 1
+        else:
+            break
+
+    return streak
+
+
+def atualizar_desafios_automaticamente(cursor, usuario_id):
+    """
+    Atualiza os desafios do usuário usando somente informações
+    registradas no banco. O usuário não consegue informar
+    manualmente que concluiu um desafio.
+    """
+
+    cursor.execute("""
+        SELECT
+            ud.id,
+            ud.desafio_id,
+            ud.data_inicio,
+            ud.progresso,
+            ud.concluido,
+            d.titulo,
+            d.meta,
+            d.tipo,
+            d.pontos
+        FROM usuario_desafios ud
+        JOIN desafios d
+            ON ud.desafio_id = d.id
+        WHERE ud.usuario_id = %s
+        AND d.ativo = 1
+        ORDER BY d.id
+    """, (usuario_id,))
+
+    participacoes = cursor.fetchall()
+    atualizados = []
+
+    for participacao in participacoes:
+        (
+            usuario_desafio_id,
+            desafio_id,
+            data_inicio,
+            progresso_atual,
+            concluido_atual,
+            titulo,
+            meta,
+            tipo,
+            pontos
+        ) = participacao
+
+        # Desafio já concluído não precisa ser recalculado.
+        if concluido_atual:
+            continue
+
+        if tipo == "streak":
+            progresso = calcular_streak_desafio(
+                cursor,
+                usuario_id,
+                data_inicio
+            )
+        else:
+            # Desafios do tipo "treinos" contam apenas os treinos
+            # concluídos depois da entrada do usuário no desafio.
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM treinos_concluidos
+                WHERE usuario_id = %s
+                AND data_conclusao >= %s
+            """, (usuario_id, data_inicio))
+
+            resultado = cursor.fetchone()
+            progresso = resultado[0] if resultado else 0
+
+        if progresso > meta:
+            progresso = meta
+
+        if progresso < 0:
+            progresso = 0
+
+        foi_concluido = progresso >= meta
+
+        if foi_concluido:
+            cursor.execute("""
+                UPDATE usuario_desafios
+                SET
+                    progresso = %s,
+                    concluido = 1,
+                    data_conclusao = NOW()
+                WHERE id = %s
+            """, (
+                progresso,
+                usuario_desafio_id
+            ))
+
+            atualizados.append({
+                "id": desafio_id,
+                "titulo": titulo,
+                "progresso": progresso,
+                "meta": meta,
+                "pontos": pontos,
+                "concluido": True
+            })
+
+        else:
+            # Atualiza mesmo quando ainda não concluiu, para a tela
+            # mostrar o progresso correto.
+            cursor.execute("""
+                UPDATE usuario_desafios
+                SET progresso = %s
+                WHERE id = %s
+            """, (
+                progresso,
+                usuario_desafio_id
+            ))
+
+    return atualizados
+
+
+# LISTAR TODOS OS DESAFIOS DISPONÍVEIS
+@app.route("/desafios", methods=["GET"])
+def listar_desafios():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT
+                id,
+                titulo,
+                titulo AS nome,
+                descricao,
+                meta,
+                tipo,
+                pontos,
+                pontos AS recompensa,
+                ativo
+            FROM desafios
+            WHERE ativo = 1
+            ORDER BY id
+        """)
+
+        desafios = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify(desafios), 200
+
+    except Exception as e:
+        print("ERRO AO LISTAR DESAFIOS:", e)
+
+        return jsonify({
+            "erro": "Erro ao carregar desafios"
+        }), 500
+
+
+# PARTICIPAR DE UM DESAFIO
+@app.route("/desafios/participar", methods=["POST"])
+def participar_desafio():
+    try:
+        data = request.get_json() or {}
+
+        usuario_id = data.get("usuario_id")
+        desafio_id = data.get("desafio_id")
+
+        if not usuario_id or not desafio_id:
+            return jsonify({
+                "erro": "Usuário e desafio são obrigatórios"
+            }), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Verifica se o desafio existe e está ativo.
+        cursor.execute("""
+            SELECT id, titulo, meta, tipo, pontos
+            FROM desafios
+            WHERE id = %s
+            AND ativo = 1
+        """, (desafio_id,))
+
+        desafio = cursor.fetchone()
+
+        if not desafio:
+            cursor.close()
+            conn.close()
+
+            return jsonify({
+                "erro": "Desafio não encontrado ou inativo"
+            }), 404
+
+        # Verifica se já participa.
+        cursor.execute("""
+            SELECT id, concluido
+            FROM usuario_desafios
+            WHERE usuario_id = %s
+            AND desafio_id = %s
+        """, (
+            usuario_id,
+            desafio_id
+        ))
+
+        existente = cursor.fetchone()
+
+        if existente:
+            cursor.close()
+            conn.close()
+
+            if existente[1]:
+                return jsonify({
+                    "erro": "Você já concluiu este desafio."
+                }), 409
+
+            return jsonify({
+                "erro": "Você já participa deste desafio."
+            }), 409
+
+        # Cria a participação. A partir deste momento, somente
+        # treinos realizados depois desta data contam para o desafio.
+        cursor.execute("""
+            INSERT INTO usuario_desafios
+            (
+                usuario_id,
+                desafio_id,
+                progresso,
+                concluido,
+                data_inicio
+            )
+            VALUES
+            (
+                %s,
+                %s,
+                0,
+                0,
+                NOW()
+            )
+        """, (
+            usuario_id,
+            desafio_id
+        ))
+
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "mensagem": "Você entrou no desafio!",
+            "desafio": desafio[1],
+            "meta": desafio[2],
+            "tipo": desafio[3],
+            "pontos": desafio[4]
+        }), 201
+
+    except Exception as e:
+        print("ERRO AO PARTICIPAR DO DESAFIO:", e)
+
+        return jsonify({
+            "erro": "Erro ao participar do desafio"
+        }), 500
+
+
+# MEUS DESAFIOS
+@app.route("/meus-desafios/<int:usuario_id>", methods=["GET"])
+def meus_desafios(usuario_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Recalcula o progresso antes de mostrar a tela.
+        atualizar_desafios_automaticamente(cursor, usuario_id)
+        conn.commit()
+
+        cursor.close()
+        cursor = conn.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT
+                d.id,
+                d.titulo,
+                d.titulo AS nome,
+                d.descricao,
+                d.meta,
+                d.tipo,
+                d.pontos,
+                d.pontos AS recompensa,
+                ud.progresso,
+                ud.concluido,
+                ud.data_inicio,
+                ud.data_conclusao
+            FROM usuario_desafios ud
+            JOIN desafios d
+                ON ud.desafio_id = d.id
+            WHERE ud.usuario_id = %s
+            ORDER BY ud.concluido ASC, d.id
+        """, (usuario_id,))
+
+        desafios = cursor.fetchall()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify(desafios), 200
+
+    except Exception as e:
+        print("ERRO AO BUSCAR MEUS DESAFIOS:", e)
+
+        return jsonify({
+            "erro": "Erro ao carregar seus desafios"
+        }), 500
+
+
+# ATUALIZAR/VALIDAR PROGRESSO DO DESAFIO
+# Esta rota foi mantida para não quebrar o frontend existente.
+# O valor enviado pelo navegador NÃO é usado como prova de conclusão.
+# O servidor recalcula o progresso diretamente pelo banco.
+@app.route("/desafios/progresso", methods=["PUT"])
+def atualizar_progresso_desafio():
+    try:
+        data = request.get_json() or {}
+
+        usuario_id = data.get("usuario_id")
+        desafio_id = data.get("desafio_id")
+
+        if not usuario_id or not desafio_id:
+            return jsonify({
+                "erro": "Usuário e desafio são obrigatórios"
+            }), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Verifica se o usuário participa do desafio.
+        cursor.execute("""
+            SELECT ud.id
+            FROM usuario_desafios ud
+            WHERE ud.usuario_id = %s
+            AND ud.desafio_id = %s
+        """, (
+            usuario_id,
+            desafio_id
+        ))
+
+        participacao = cursor.fetchone()
+
+        if not participacao:
+            cursor.close()
+            conn.close()
+
+            return jsonify({
+                "erro": "Você ainda não participa deste desafio"
+            }), 403
+
+        # Recalcula TODOS os desafios pelo banco.
+        atualizar_desafios_automaticamente(cursor, usuario_id)
+        conn.commit()
+
+        cursor.execute("""
+            SELECT
+                d.titulo,
+                d.meta,
+                d.pontos,
+                ud.progresso,
+                ud.concluido
+            FROM usuario_desafios ud
+            JOIN desafios d
+                ON ud.desafio_id = d.id
+            WHERE ud.usuario_id = %s
+            AND ud.desafio_id = %s
+        """, (
+            usuario_id,
+            desafio_id
+        ))
+
+        resultado = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        if not resultado:
+            return jsonify({
+                "erro": "Desafio não encontrado"
+            }), 404
+
+        return jsonify({
+            "mensagem": (
+                "🏆 Desafio concluído!"
+                if resultado[4]
+                else "Progresso atualizado automaticamente!"
+            ),
+            "titulo": resultado[0],
+            "progresso": resultado[3],
+            "meta": resultado[1],
+            "pontos": resultado[2],
+            "concluido": bool(resultado[4])
+        }), 200
+
+    except Exception as e:
+        print("ERRO AO ATUALIZAR DESAFIO:", e)
+
+        return jsonify({
+            "erro": "Erro ao atualizar progresso"
         }), 500
 
 # ▶️ SEMPRE POR ÚLTIMO

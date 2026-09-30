@@ -1,113 +1,211 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Dashboard - Olympus</title>
-  <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <title>Dashboard - Olympus</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body onload="verificarLogin()">
 
 <div class="dashboard">
 
-  <header class="topbar">
-    <h2>OLYMPUS GYM</h2>
+    <header class="topbar">
 
-    <div class="user-info">
-      <span id="nomeUsuario"></span>
-      <button class="btn-amarelo" onclick="logout()">Sair</button>
-    </div>
-  </header>
+        <h2>OLYMPUS GYM</h2>
 
-  <main class="cards">
+        <div class="user-info">
 
-    <div class="card"
-    onclick="window.location.href='treinos.html'">
-      <h3>💪 TREINOS</h3>
-      <p>Acesse seus treinos personalizados</p>
-    </div>
+            <span id="nomeUsuario"></span>
 
-    <div class="card" 
-    onclick="window.location.href='agendamentos.html'">
-      <h3>📅 AGENDAMENTOS</h3>
-      <p>Acesse seus agendamentos</p>
-    </div>
+            <button
+                class="btn-amarelo"
+                onclick="logout()">
+                Sair
+            </button>
 
-    <div class="card"
-    onclick="window.location.href='progresso.html'">
-      <h3>📊 PROGRESSO</h3>
-      <p>Acompanhe sua evolução</p>
-    </div>
+        </div>
 
-<!-- 🧮 CALCULADORA IMC/TMB -->
+    </header>
 
-<div
-    class="card"
-    onclick="window.location.href='calculadora.html'"
->
 
-    <h3>🧮 CALCULADORA</h3>
+    <main class="cards">
 
-    <p>
-        Calcule seu IMC e TMB
-    </p>
+        <!-- 💪 TREINOS -->
+        <div
+            class="card"
+            onclick="window.location.href='treinos.html'">
+
+            <h3>💪 TREINOS</h3>
+
+            <p>
+                Acesse seus treinos personalizados
+            </p>
+
+        </div>
+
+
+        <!-- 📅 AGENDAMENTOS -->
+        <div
+            class="card"
+            onclick="window.location.href='agendamentos.html'">
+
+            <h3>📅 AGENDAMENTOS</h3>
+
+            <p>
+                Acesse seus agendamentos
+            </p>
+
+        </div>
+
+
+        <!-- 📊 PROGRESSO -->
+        <div
+            class="card"
+            onclick="window.location.href='progresso.html'">
+
+            <h3>📊 PROGRESSO</h3>
+
+            <p>
+                Acompanhe sua evolução
+            </p>
+
+        </div>
+
+
+        <!-- 🧮 CALCULADORA -->
+        <div
+            class="card"
+            onclick="window.location.href='calculadora.html'">
+
+            <h3>🧮 CALCULADORA</h3>
+
+            <p>
+                Calcule seu IMC e TMB
+            </p>
+
+        </div>
+
+
+        <!-- 💳 PLANOS -->
+        <div
+            class="card"
+            onclick="irPlanos()">
+
+            <h3>💳 PLANOS</h3>
+
+            <p id="planoAtual">
+                Carregando...
+            </p>
+
+            <p id="statusPlano">
+                Verificando...
+            </p>
+
+        </div>
+
+
+        <!-- 🎯 QUIZ TREINO IDEAL -->
+        <div
+            class="card"
+            onclick="irQuiz()">
+
+            <h3>🎯 TREINO IDEAL</h3>
+
+            <p>
+                Descubra qual treino combina com você
+            </p>
+
+        </div>
+
+
+        <!-- 🔥 SEQUÊNCIA -->
+        <div
+            class="card"
+            onclick="window.location.href='streak.html'">
+
+            <h3>🔥 MINHA SEQUÊNCIA</h3>
+
+            <p>
+                Acompanhe seus dias consecutivos de treino
+            </p>
+
+        </div>
+
+
+        <!-- 🏆 DESAFIOS -->
+        <div
+            class="card"
+            onclick="window.location.href='desafios.html'">
+
+            <h3>🏆 DESAFIOS</h3>
+
+            <p>
+                Participe de desafios e acompanhe seu progresso
+            </p>
+
+        </div>
+
+
+        <!-- ✏️ EDITAR USUÁRIO -->
+        <div class="card card-editar">
+
+            <h3>⚙️ EDITAR PERFIL</h3>
+
+            <input
+                type="text"
+                id="editNome"
+                placeholder="Novo nome">
+
+            <input
+                type="email"
+                id="editEmail"
+                placeholder="Novo email">
+
+            <input
+                type="password"
+                id="editSenha"
+                placeholder="Nova senha">
+
+            <button
+                class="btn-amarelo"
+                onclick="atualizarUsuario()">
+
+                Atualizar
+
+            </button>
+
+        </div>
+
+    </main>
+
+
+    <!-- 🔥 AÇÕES EXTRAS -->
+
+    <button
+        class="btn-amarelo"
+        onclick="deletarUsuario()"
+        style="background:red; color:white;">
+
+        Excluir Conta
+
+    </button>
+
+
+    <button
+        class="btn-amarelo"
+        onclick="irHome()">
+
+        Home
+
+    </button>
 
 </div>
 
-    <!-- 💳 PLANOS -->
-<div class="card" onclick="irPlanos()">
-
-  <h3>💳 PLANOS</h3>
-
-  <p id="planoAtual">
-    Carregando...
-  </p>
-
-  <p id="statusPlano">
-    Verificando...
-  </p>
-
-</div>
-
-<!-- 🎯 QUIZ TREINO IDEAL -->
-<div class="card"
-     onclick="irQuiz()">
-
-  <h3>🎯 TREINO IDEAL</h3>
-
-  <p>
-    Descubra qual treino combina com você
-  </p>
-
-</div>
-
-    <!-- ✏️ EDITAR USUÁRIO -->
-    <div class="card card-editar">
-      <h3>⚙️ EDITAR PERFIL</h3>
-
-      <input type="text" id="editNome" placeholder="Novo nome">
-      <input type="email" id="editEmail" placeholder="Novo email">
-      <input type="password" id="editSenha" placeholder="Nova senha">
-
-      <button class="btn-amarelo" onclick="atualizarUsuario()">
-        Atualizar
-      </button>
-    </div>
-
-  </main>
-
-</div>
-
-<!-- 🔥 AÇÕES EXTRAS -->
-<button class="btn-amarelo" onclick="deletarUsuario()" style="background:red; color:white;">
-  Excluir Conta
-</button>
-
-<button class="btn-amarelo" onclick="irHome()">Home</button>
-
-<main class="cards"></main>
 
 <script src="js/script.js"></script>
 
 </body>
+
 </html>
