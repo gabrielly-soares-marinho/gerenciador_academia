@@ -1672,3 +1672,543 @@ html {
         padding: 13px;
     }
 }
+
+/* =====================================================
+   OLYMPUS GYM - CHECK-IN
+   Estilos exclusivos desta página
+===================================================== */
+
+body.feature-body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 50px 20px;
+    display: block;
+
+    background:
+        linear-gradient(rgba(0,0,0,0.82), rgba(0,0,0,0.90)),
+        url('../img/hero.jpeg') center center / cover fixed no-repeat;
+
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+/* CONTAINER PRINCIPAL */
+
+body.feature-body .feature-container {
+    width: 100%;
+    max-width: 1100px;
+    min-height: auto;
+    margin: 0 auto;
+    padding: 35px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+
+    background: rgba(0,0,0,0.88);
+    border: 1px solid #ffd900;
+    border-radius: 22px;
+
+    box-shadow: 0 0 25px rgba(255,217,0,0.12);
+}
+
+/* CABEÇALHO - CORRIGE O HEADER FIXO GLOBAL */
+
+body.feature-body .feature-header {
+    position: relative;
+    top: auto;
+    left: auto;
+    z-index: 1;
+
+    width: 100%;
+    padding: 15px 10px 25px;
+    margin: 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    background: transparent;
+    backdrop-filter: none;
+    text-align: center;
+}
+
+body.feature-body .feature-header h1 {
+    width: 100%;
+    margin: 0;
+
+    color: #ffd900;
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+}
+
+body.feature-body .feature-header p {
+    width: 100%;
+    margin: 0;
+
+    color: #ddd;
+    font-size: 17px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+/* CARD DE BOAS-VINDAS */
+
+body.feature-body .checkin-destaque {
+    width: 100%;
+    padding: 35px 20px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+
+    background: rgba(255,217,0,0.06);
+    border: 1px solid #ffd900;
+    border-radius: 18px;
+
+    text-align: center;
+}
+
+body.feature-body .checkin-destaque h2 {
+    color: #fff;
+    font-size: 27px;
+    margin: 0;
+}
+
+body.feature-body .checkin-destaque h2 span {
+    color: #ffd900;
+}
+
+body.feature-body .checkin-destaque p {
+    color: #ddd;
+    font-size: 18px;
+    margin: 0;
+}
+
+body.feature-body .checkin-destaque small {
+    color: #bbb;
+    font-size: 14px;
+}
+
+/* BOTÃO CHECK-IN */
+
+body.feature-body .btn-checkin {
+    display: inline-block;
+    width: auto;
+    min-width: 280px;
+    padding: 16px 25px;
+    margin: 8px 0;
+
+    background: #ffd900;
+    color: #000;
+
+    border: none;
+    border-radius: 9px;
+
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+body.feature-body .btn-checkin:hover {
+    background: #eac500;
+    transform: translateY(-2px);
+}
+
+/* INDICADORES */
+
+body.feature-body .checkin-indicadores {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+
+    margin: 0;
+}
+
+body.feature-body .indicador-presenca {
+    min-height: 145px;
+    padding: 25px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    background: #181818;
+    border: 1px solid #555;
+    border-radius: 17px;
+
+    text-align: center;
+    transition: 0.3s;
+}
+
+body.feature-body .indicador-presenca:hover {
+    border-color: #ffd900;
+    transform: translateY(-3px);
+}
+
+body.feature-body .indicador-presenca span {
+    color: #ffd900;
+    font-size: 42px;
+    font-weight: bold;
+}
+
+body.feature-body .indicador-presenca p {
+    color: #fff;
+    font-size: 18px;
+    margin: 0;
+}
+
+/* HISTÓRICO */
+
+body.feature-body .historico-checkins {
+    width: 100%;
+    margin: 0;
+}
+
+body.feature-body .historico-checkins h2 {
+    color: #ffd900;
+    font-size: 25px;
+    text-align: center;
+    margin: 0 0 20px;
+}
+
+/* LISTA */
+
+body.feature-body .lista-checkins {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+body.feature-body .checkin-item {
+    width: 100%;
+    padding: 18px 22px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+
+    background: #181818;
+    border: 1px solid #444;
+    border-radius: 12px;
+
+    color: #fff;
+}
+
+body.feature-body .checkin-item strong {
+    color: #ffd900;
+}
+
+body.feature-body .estado-vazio {
+    padding: 22px;
+
+    background: #181818;
+    border: 1px dashed #666;
+    border-radius: 12px;
+
+    color: #bbb;
+    text-align: center;
+}
+
+/* BOTÃO VOLTAR */
+
+body.feature-body .feature-actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 5px;
+}
+
+body.feature-body .feature-actions button {
+    min-width: 180px;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 700px) {
+
+    body.feature-body {
+        padding: 20px 12px;
+    }
+
+    body.feature-body .feature-container {
+        padding: 20px 15px;
+    }
+
+    body.feature-body .feature-header h1 {
+        font-size: 27px;
+    }
+
+    body.feature-body .checkin-indicadores {
+        grid-template-columns: 1fr;
+    }
+
+    body.feature-body .checkin-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    body.feature-body .btn-checkin {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+
+/* =========================================
+   NOTIFICAÇÕES - OLYMPUS GYM
+========================================= */
+
+body.notificacoes-body {
+    min-height: 100vh;
+    padding: 50px 20px;
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.88), rgba(0, 0, 0, 0.94)),
+        url("../img/academia.jpeg") center/cover fixed;
+    color: #fff;
+}
+
+/* CONTAINER PRINCIPAL */
+
+body.notificacoes-body .feature-container {
+    width: 100%;
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 45px;
+    background: rgba(5, 5, 5, 0.96);
+    border: 1px solid #ffd700;
+    border-radius: 22px;
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.12);
+}
+
+/* CABEÇALHO */
+
+body.notificacoes-body .feature-header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    margin-bottom: 35px;
+    padding: 10px;
+}
+
+body.notificacoes-body .feature-header h1 {
+    color: #ffd700;
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+body.notificacoes-body .feature-header p {
+    color: #ddd;
+    font-size: 16px;
+    margin: 0;
+}
+
+body.notificacoes-body #resumoNotificacoes {
+    color: #ffd700;
+    font-size: 15px;
+}
+
+/* BOTÃO MARCAR TODAS */
+
+body.notificacoes-body .notificacoes-acoes {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 25px;
+}
+
+body.notificacoes-body .notificacoes-acoes button {
+    padding: 12px 22px;
+    background: #ffd700;
+    color: #000;
+    border: none;
+    border-radius: 9px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+body.notificacoes-body .notificacoes-acoes button:hover {
+    background: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+/* LISTA DE NOTIFICAÇÕES */
+
+body.notificacoes-body .lista-notificacoes {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* CARTÃO DE NOTIFICAÇÃO */
+
+body.notificacoes-body .notificacao-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 22px 25px;
+    border-radius: 13px;
+    border: 1px solid #333;
+    background: #151515;
+    transition: 0.3s ease;
+}
+
+body.notificacoes-body .notificacao-item:hover {
+    transform: translateY(-3px);
+    border-color: #ffd700;
+    box-shadow: 0 5px 18px rgba(255, 215, 0, 0.10);
+}
+
+/* NÃO LIDA */
+
+body.notificacoes-body .notificacao-nao-lida {
+    background: linear-gradient(110deg, #24200d, #151515);
+    border-left: 5px solid #ffd700;
+}
+
+/* JÁ LIDA */
+
+body.notificacoes-body .notificacao-lida {
+    opacity: 0.65;
+    border-left: 5px solid #555;
+}
+
+/* CONTEÚDO */
+
+body.notificacoes-body .notificacao-conteudo {
+    flex: 1;
+}
+
+body.notificacoes-body .notificacao-conteudo h3 {
+    color: #ffd700;
+    font-size: 18px;
+    margin: 0 0 9px;
+}
+
+body.notificacoes-body .notificacao-conteudo p {
+    color: #ddd;
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 0 10px;
+}
+
+body.notificacoes-body .notificacao-conteudo small {
+    color: #999;
+    font-size: 12px;
+}
+
+/* STATUS */
+
+body.notificacoes-body .status-lida {
+    color: #aaa;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+/* BOTÕES DENTRO DAS NOTIFICAÇÕES */
+
+body.notificacoes-body .notificacao-item button {
+    padding: 10px 15px;
+    background: transparent;
+    color: #ffd700;
+    border: 1px solid #ffd700;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+body.notificacoes-body .notificacao-item button:hover {
+    background: #ffd700;
+    color: #000;
+}
+
+/* LISTA VAZIA */
+
+body.notificacoes-body .estado-vazio {
+    padding: 28px;
+    text-align: center;
+    color: #ccc;
+    background: #181818;
+    border: 1px dashed #555;
+    border-radius: 13px;
+    font-size: 16px;
+}
+
+/* BOTÃO VOLTAR */
+
+body.notificacoes-body .feature-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+}
+
+body.notificacoes-body .feature-actions button {
+    min-width: 180px;
+    padding: 13px 22px;
+    background: #ffd700;
+    color: #000;
+    border: none;
+    border-radius: 9px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+body.notificacoes-body .feature-actions button:hover {
+    background: #fff;
+    transform: translateY(-2px);
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 650px) {
+
+    body.notificacoes-body {
+        padding: 20px 12px;
+    }
+
+    body.notificacoes-body .feature-container {
+        padding: 25px 16px;
+    }
+
+    body.notificacoes-body .feature-header h1 {
+        font-size: 27px;
+    }
+
+    body.notificacoes-body .notificacoes-acoes {
+        justify-content: center;
+    }
+
+    body.notificacoes-body .notificacao-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 18px;
+    }
+
+    body.notificacoes-body .notificacao-item button {
+        width: 100%;
+    }
+}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check-in - Olympus Gym</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="feature-body" onload="verificarLogin(); carregarCheckins();">
+
+    <main class="feature-container">
+        <header class="feature-header">
+            <h1>🟡 CHECK-IN DE PRESENÇA</h1>
+            <p>Registre sua entrada na Olympus Gym e acompanhe sua frequência.</p>
+        </header>
+
+        <section class="checkin-destaque">
+            <h2>Olá, <span id="nomeUsuario">atleta</span>!</h2>
+            <p>Pronto para mais um treino?</p>
+
+            <button id="btnCheckin" class="btn-amarelo btn-checkin"
+                    type="button" onclick="registrarCheckin()">
+                REGISTRAR MEU CHECK-IN
+            </button>
+
+            <small>É permitido um registro de presença por dia.</small>
+        </section>
+
+        <section class="checkin-indicadores">
+            <article class="indicador-presenca">
+                <span id="totalCheckinsMes">0</span>
+                <p>Presenças neste mês</p>
+            </article>
+
+            <article class="indicador-presenca">
+                <span id="totalCheckins">0</span>
+                <p>Total de presenças</p>
+            </article>
+        </section>
+
+        <section class="historico-checkins">
+            <h2>Meu histórico de frequência</h2>
+
+            <div id="listaCheckins" class="lista-checkins">
+                <p class="estado-vazio">Carregando histórico...</p>
+            </div>
+        </section>
+
+        <div class="feature-actions">
+            <button class="btn-amarelo" type="button"
+                    onclick="voltarDashboard()">
+                Voltar ao painel
+            </button>
+        </div>
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

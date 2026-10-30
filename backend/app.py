@@ -1850,6 +1850,311 @@ def atualizar_progresso_desafio():
             "erro": "Erro ao atualizar progresso"
         }), 500
 
+    # ==========================================================
+# TABELAS E FUNÇÃO DE NOTIFICAÇÕES
+# ==========================================================
+
+def garantir_tabelas_novas(cursor):
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS checkins (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            usuario_id INT NOT NULL,
+            data_hora DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_checkins_usuario_data (usuario_id, data_hora)
+        )
+    """)
+
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS notificacoes (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            usuario_id INT NOT NULL,
+            tipo VARCHAR(40) NOT NULL,
+            titulo VARCHAR(150) NOT NULL,
+            mensagem VARCHAR(500) NOT NULL,
+            referencia_id INT NULL,
+            lida TINYINT(1) NOT NULL DEFAULT 0,
+            data_criacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_notificacoes_usuario_data (usuario_id, data_criacao),
+            INDEX idx_notificacoes_usuario_lida (usuario_id, lida)
+        )
+    """)
+
+
+def criar_notificacao(cursor, usuario_id, tipo, titulo, mensagem,
+                      referencia_id=None, evitar_duplicada=False):
+
+    garantir_tabelas_novas(cursor)
+
+    if evitar_duplicada and referencia_id is not None:
+        cursor.execute("""
+            SELECT id
+            FROM notificacoes
+            WHERE usuario_id = %s
+              AND tipo = %s
+              AND referencia_id = %s
+            LIMIT 1
+        """, (usuario_id, tipo, referencia_id))
+
+        if cursor.fetchone():
+            return
+
+    cursor.execute("""
+        INSERT INTO notificacoes
+            (usuario_id, tipo, titulo, mensagem, referencia_id, lida)
+        VALUES (%s, %s, %s, %s, %s, 0)
+    """, (usuario_id, tipo, titulo, mensagem, referencia_id))
+
+# ==========================================================
+# CHECK-IN DE PRESENÇA
+# ==========================================================
+
+@app.route("/checkin", methods=["POST"])
+def registrar_checkin():
+    try:
+        data = request.get_json() or {}
+        usuario_id = data.get("usuario_id")
+
+        if not usuario_id:
+            return jsonify({"erro": "Usuário não informado"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        garantir_tabelas_novas(cursor)
+
+        cursor.execute(
+            "SELECT id FROM usuarios WHERE id = %s",
+            (usuario_id,)
+        )
+
+        if not cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return jsonify({"erro": "Usuário não encontrado"}), 404
+
+        cursor.execute("""
+            SELECT id, data_hora
+            FROM checkins
+            WHERE usuario_id = %s
+              AND DATE(data_hora) = CURDATE()
+            ORDER BY data_hora DESC
+            LIMIT 1
+        """, (usuario_id,))
+
+        checkin_existente = cursor.fetchone()
+
+        if checkin_existente:
+            cursor.close()
+            conn.close()
+
+            return jsonify({
+                "erro": "Seu check-in de hoje já foi registrado.",
+                "data_hora": str(checkin_existente[1])
+            }), 409
+
+        cursor.execute("""
+            INSERT INTO checkins (usuario_id, data_hora)
+            VALUES (%s, NOW())
+        """, (usuario_id,))
+
+        checkin_id = cursor.lastrowid
+        conn.commit()
+
+        cursor.execute("""
+            SELECT data_hora
+            FROM checkins
+            WHERE id = %s
+        """, (checkin_id,))
+
+        registro = cursor.fetchone()
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "mensagem": "Check-in realizado com sucesso!",
+            "id": checkin_id,
+            "data_hora": str(registro[0])
+        }), 201
+
+    except Exception as e:
+        print("ERRO AO REGISTRAR CHECK-IN:", e)
+        return jsonify({"erro": "Erro ao registrar check-in"}), 500
+
+
+@app.route("/checkins/<int:usuario_id>", methods=["GET"])
+def listar_checkins(usuario_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        garantir_tabelas_novas(cursor)
+
+        cursor.execute("""
+            SELECT id, data_hora
+            FROM checkins
+            WHERE usuario_id = %s
+            ORDER BY data_hora DESC
+        """, (usuario_id,))
+
+        registros = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM checkins
+            WHERE usuario_id = %s
+              AND YEAR(data_hora) = YEAR(CURDATE())
+              AND MONTH(data_hora) = MONTH(CURDATE())
+        """, (usuario_id,))
+
+        total_mes = cursor.fetchone()[0]
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "total_mes": total_mes,
+            "total": len(registros),
+            "checkins": [
+                {
+                    "id": item[0],
+                    "data_hora": str(item[1])
+                }
+                for item in registros
+            ]
+        }), 200
+
+    except Exception as e:
+        print("ERRO AO LISTAR CHECK-INS:", e)
+        return jsonify({
+            "erro": "Erro ao carregar histórico de presença"
+        }), 500
+
+
+# ==========================================================
+# NOTIFICAÇÕES
+# ==========================================================
+
+@app.route("/notificacoes/<int:usuario_id>", methods=["GET"])
+def listar_notificacoes(usuario_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        garantir_tabelas_novas(cursor)
+
+        cursor.execute("""
+            SELECT id, tipo, titulo, mensagem, lida, data_criacao
+            FROM notificacoes
+            WHERE usuario_id = %s
+            ORDER BY data_criacao DESC, id DESC
+        """, (usuario_id,))
+
+        registros = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM notificacoes
+            WHERE usuario_id = %s AND lida = 0
+        """, (usuario_id,))
+
+        nao_lidas = cursor.fetchone()[0]
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "nao_lidas": nao_lidas,
+            "total": len(registros),
+            "notificacoes": [
+                {
+                    "id": item[0],
+                    "tipo": item[1],
+                    "titulo": item[2],
+                    "mensagem": item[3],
+                    "lida": bool(item[4]),
+                    "data_criacao": str(item[5])
+                }
+                for item in registros
+            ]
+        }), 200
+
+    except Exception as e:
+        print("ERRO AO LISTAR NOTIFICAÇÕES:", e)
+        return jsonify({
+            "erro": "Erro ao carregar notificações"
+        }), 500
+
+
+@app.route("/notificacoes/<int:notificacao_id>/lida", methods=["PUT"])
+def marcar_notificacao_lida(notificacao_id):
+    try:
+        data = request.get_json() or {}
+        usuario_id = data.get("usuario_id")
+
+        if not usuario_id:
+            return jsonify({"erro": "Usuário não informado"}), 400
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        garantir_tabelas_novas(cursor)
+
+        cursor.execute("""
+            UPDATE notificacoes
+            SET lida = 1
+            WHERE id = %s AND usuario_id = %s
+        """, (notificacao_id, usuario_id))
+
+        alteradas = cursor.rowcount
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        if not alteradas:
+            return jsonify({
+                "erro": "Notificação não encontrada"
+            }), 404
+
+        return jsonify({
+            "mensagem": "Notificação marcada como lida."
+        }), 200
+
+    except Exception as e:
+        print("ERRO AO MARCAR NOTIFICAÇÃO:", e)
+        return jsonify({
+            "erro": "Erro ao atualizar notificação"
+        }), 500
+
+
+@app.route("/notificacoes/usuario/<int:usuario_id>/ler-todas", methods=["PUT"])
+def marcar_todas_notificacoes_lidas(usuario_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        garantir_tabelas_novas(cursor)
+
+        cursor.execute("""
+            UPDATE notificacoes
+            SET lida = 1
+            WHERE usuario_id = %s AND lida = 0
+        """, (usuario_id,))
+
+        quantidade = cursor.rowcount
+
+        conn.commit()
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            "mensagem": "Todas as notificações foram marcadas como lidas.",
+            "atualizadas": quantidade
+        }), 200
+
+    except Exception as e:
+        print("ERRO AO MARCAR TODAS AS NOTIFICAÇÕES:", e)
+        return jsonify({
+            "erro": "Erro ao atualizar notificações"
+        }), 500
+
+
 # ▶️ SEMPRE POR ÚLTIMO
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

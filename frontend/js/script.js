@@ -61,6 +61,7 @@ async function login(event) {
 
 // 👀 VERIFICAR LOGIN + BUSCAR PLANO
 async function verificarLogin() {
+
     const usuario = localStorage.getItem("usuario");
 
     if (!usuario) {
@@ -74,7 +75,7 @@ async function verificarLogin() {
     const nomeEl = document.getElementById("nomeUsuario");
     if (nomeEl) nomeEl.innerText = dados.nome;
 
-    // 🔥 IMPORTANTE: aguardar resposta corretamente
+    // Buscar informações do usuário e do plano
     try {
         const response = await fetch(`${API_URL}/usuarios/${dados.id}`);
 
@@ -88,34 +89,28 @@ async function verificarLogin() {
 
         if (planoEl) {
 
-            const statusPlano =
-                document.getElementById(
-                    "statusPlano"
-                );
+            const statusPlano = document.getElementById("statusPlano");
 
             if (data.plano_nome) {
 
-                planoEl.innerHTML =
-                    "🏆 " + data.plano_nome;
+                planoEl.innerHTML = "🏆 " + data.plano_nome;
 
-                if(statusPlano){
-
-                    statusPlano.innerHTML =
-                        "✅ Plano Ativo";
+                if (statusPlano) {
+                    statusPlano.innerHTML = "✅ Plano Ativo";
                 }
 
-        } else {
+            } else {
 
-            planoEl.innerHTML =
-                "Nenhum plano ativo";
+                planoEl.innerHTML = "Nenhum plano ativo";
 
-            if(statusPlano){
-
-                statusPlano.innerHTML =
-                    "❌ Sem assinatura";
+                if (statusPlano) {
+                    statusPlano.innerHTML = "❌ Sem assinatura";
+                }
             }
         }
-    }
+
+        // 🔔 Atualizar contador de notificações
+        atualizarContadorNotificacoes();
 
     } catch (error) {
         console.error("Erro ao buscar plano:", error);
@@ -309,4 +304,297 @@ function irQuiz() {
 
     window.location.href =
         "quiz-treino.html";
+}
+
+// ==========================================================
+// CHECK-IN DE PRESENÇA
+// ==========================================================
+
+function obterUsuarioLogado() {
+    try {
+        return JSON.parse(localStorage.getItem("usuario"));
+    } catch (erro) {
+        return null;
+    }
+}
+
+function formatarDataHora(valor) {
+    if (!valor) return "";
+
+    const data = new Date(String(valor).replace(" ", "T"));
+
+    if (Number.isNaN(data.getTime())) return valor;
+
+    return data.toLocaleString("pt-BR", {
+        dateStyle: "short",
+        timeStyle: "short"
+    });
+}
+
+async function registrarCheckin() {
+    const usuario = obterUsuarioLogado();
+
+    if (!usuario) {
+        alert("Faça login para registrar sua presença.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    const botao = document.getElementById("btnCheckin");
+
+    if (botao) botao.disabled = true;
+
+    try {
+        const response = await fetch(`${API_URL}/checkin`, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ usuario_id: usuario.id })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("✅ " + data.mensagem);
+            await carregarCheckins();
+        } else {
+            alert("ℹ️ " + (data.erro || "Não foi possível registrar o check-in."));
+            await carregarCheckins();
+        }
+
+    } catch (error) {
+        console.error("Erro ao registrar check-in:", error);
+        alert("Erro ao conectar com o servidor.");
+
+    } finally {
+        if (botao) botao.disabled = false;
+    }
+}
+
+async function carregarCheckins() {
+    const usuario = obterUsuarioLogado();
+
+    if (!usuario) return;
+
+    const lista = document.getElementById("listaCheckins");
+    const totalMes = document.getElementById("totalCheckinsMes");
+    const totalGeral = document.getElementById("totalCheckins");
+
+    try {
+        const response = await fetch(`${API_URL}/checkins/${usuario.id}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.erro || "Erro ao buscar presenças.");
+        }
+
+        if (totalMes) totalMes.textContent = data.total_mes ?? 0;
+        if (totalGeral) totalGeral.textContent = data.total ?? 0;
+
+        if (!lista) return;
+
+        lista.innerHTML = "";
+
+        if (!data.checkins || data.checkins.length === 0) {
+            lista.innerHTML = '<p class="estado-vazio">Você ainda não possui presenças registradas.</p>';
+            return;
+        }
+
+        data.checkins.forEach((item) => {
+            const registro = document.createElement("div");
+            registro.className = "checkin-item";
+
+            const dataHora = document.createElement("span");
+            dataHora.textContent = formatarDataHora(item.data_hora);
+
+            const status = document.createElement("strong");
+            status.textContent = "Presença confirmada";
+
+            registro.append(dataHora, status);
+            lista.appendChild(registro);
+        });
+
+    } catch (error) {
+        console.error("Erro ao carregar check-ins:", error);
+
+        if (lista) {
+            lista.innerHTML = '<p class="estado-vazio">Não foi possível carregar o histórico.</p>';
+        }
+    }
+}
+
+
+// ==========================================================
+// NOTIFICAÇÕES E LEMBRETES
+// ==========================================================
+
+async function atualizarContadorNotificacoes() {
+    const usuario = obterUsuarioLogado();
+    const contador = document.getElementById("contadorNotificacoes");
+
+    if (!usuario || !contador) return;
+
+    try {
+        const response = await fetch(`${API_URL}/notificacoes/${usuario.id}`);
+        const data = await response.json();
+
+        if (!response.ok) return;
+
+        const quantidade = Number(data.nao_lidas || 0);
+
+        contador.textContent = quantidade;
+        contador.style.display = quantidade > 0 ? "inline-flex" : "none";
+
+    } catch (error) {
+        console.error("Erro ao atualizar contador:", error);
+    }
+}
+
+async function carregarNotificacoes() {
+    const usuario = obterUsuarioLogado();
+
+    if (!usuario) return;
+
+    const lista = document.getElementById("listaNotificacoes");
+    const resumo = document.getElementById("resumoNotificacoes");
+
+    try {
+        const response = await fetch(`${API_URL}/notificacoes/${usuario.id}`);
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.erro || "Erro ao buscar notificações.");
+        }
+
+        if (resumo) {
+            resumo.textContent =
+                `${data.nao_lidas || 0} notificação(ões) não lida(s)`;
+        }
+
+        if (!lista) return;
+
+        lista.innerHTML = "";
+
+        if (!data.notificacoes || data.notificacoes.length === 0) {
+            lista.innerHTML = '<p class="estado-vazio">Você ainda não possui notificações.</p>';
+            return;
+        }
+
+        data.notificacoes.forEach((item) => {
+            const card = document.createElement("article");
+
+            card.className = `notificacao-item${
+                item.lida ? " notificacao-lida" : " notificacao-nao-lida"
+            }`;
+
+            const conteudo = document.createElement("div");
+            conteudo.className = "notificacao-conteudo";
+
+            const titulo = document.createElement("h3");
+            titulo.textContent = item.titulo;
+
+            const mensagem = document.createElement("p");
+            mensagem.textContent = item.mensagem;
+
+            const dataHora = document.createElement("small");
+            dataHora.textContent = formatarDataHora(item.data_criacao);
+
+            conteudo.append(titulo, mensagem, dataHora);
+            card.appendChild(conteudo);
+
+            if (!item.lida) {
+                const botao = document.createElement("button");
+
+                botao.type = "button";
+                botao.className = "btn-amarelo";
+                botao.textContent = "Marcar como lida";
+
+                botao.addEventListener("click", () => {
+                    marcarNotificacaoLida(item.id);
+                });
+
+                card.appendChild(botao);
+
+            } else {
+                const status = document.createElement("span");
+
+                status.className = "status-lida";
+                status.textContent = "Lida";
+
+                card.appendChild(status);
+            }
+
+            lista.appendChild(card);
+        });
+
+        await atualizarContadorNotificacoes();
+
+    } catch (error) {
+        console.error("Erro ao carregar notificações:", error);
+
+        if (lista) {
+            lista.innerHTML = '<p class="estado-vazio">Não foi possível carregar as notificações.</p>';
+        }
+    }
+}
+
+async function marcarNotificacaoLida(notificacaoId) {
+    const usuario = obterUsuarioLogado();
+
+    if (!usuario) return;
+
+    try {
+        const response = await fetch(
+            `${API_URL}/notificacoes/${notificacaoId}/lida`,
+            {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({ usuario_id: usuario.id })
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.erro || "Erro ao atualizar notificação.");
+        }
+
+        await carregarNotificacoes();
+
+    } catch (error) {
+        console.error(error);
+        alert("Não foi possível marcar a notificação como lida.");
+    }
+}
+
+async function marcarTodasNotificacoesLidas() {
+    const usuario = obterUsuarioLogado();
+
+    if (!usuario) return;
+
+    try {
+        const response = await fetch(
+            `${API_URL}/notificacoes/usuario/${usuario.id}/ler-todas`,
+            { method: "PUT" }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.erro || "Erro ao atualizar notificações.");
+        }
+
+        await carregarNotificacoes();
+
+    } catch (error) {
+        console.error(error);
+        alert("Não foi possível atualizar as notificações.");
+    }
+}
+
+function irCheckin() {
+    window.location.href = "checkin.html";
+}
+
+function irNotificacoes() {
+    window.location.href = "notificacoes.html";
 }

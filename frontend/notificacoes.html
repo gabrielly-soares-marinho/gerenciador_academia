@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notificações - Olympus Gym</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="feature-body notificacoes-body"
+      onload="verificarLogin(); carregarNotificacoes();">
+
+    <main class="feature-container">
+        <header class="feature-header">
+            <h1>🔔 NOTIFICAÇÕES</h1>
+            <p>Fique por dentro das novidades da sua rotina na Olympus Gym.</p>
+            <strong id="resumoNotificacoes">
+                Carregando notificações...
+            </strong>
+        </header>
+
+        <div class="notificacoes-acoes">
+            <button class="btn-amarelo" type="button"
+                    onclick="marcarTodasNotificacoesLidas()">
+                Marcar todas como lidas
+            </button>
+        </div>
+
+        <section id="listaNotificacoes" class="lista-notificacoes">
+            <p class="estado-vazio">Carregando...</p>
+        </section>
+
+        <div class="feature-actions">
+            <button class="btn-amarelo" type="button"
+                    onclick="voltarDashboard()">
+                Voltar ao painel
+            </button>
+        </div>
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
